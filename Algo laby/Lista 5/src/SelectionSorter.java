@@ -10,7 +10,7 @@ public class SelectionSorter implements ISorter {
         // TODO
         // Pamiętaj o wywołaniu checker.check(values); po kazdym wywołaniu zewnętrznej petli
 
-        int temp_value;
+
         for(int i = 0; i< values.length;i++){
             int index = i;
             int index_of_min = i;
