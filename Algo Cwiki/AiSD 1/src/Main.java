@@ -87,7 +87,15 @@ public class Main {
         sortowac.add(0);
         sortowac.add(2);
         sortowac.add(1);
+        sortowac.add(9);
+        sortowac.add(3);
         QuickSort.QuickSort(sortowac,0,sortowac.size()-1);
         System.out.println(sortowac);
+        Heap heap = new Heap(sortowac);
+        System.out.println(heap.parentPos(1));
+        System.out.println(heap.poll());
+        System.out.println(heap.getHeapstructure());
+
     }
+
 }

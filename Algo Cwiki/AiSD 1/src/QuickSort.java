@@ -2,16 +2,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static java.util.Collections.swap;
+
 public class QuickSort {
     public static void QuickSort(ArrayList<Integer> list,int left,int right){
         int start_left = left--;
         int pivot = right;
         int start_right = right;
         if(start_left<right) {
-            left = partition(list,left,right);
-            Collections.swap(list,list.size()-1,left);
-            QuickSort(list, start_left, left-1);
-            QuickSort(list, left+1, start_right);
+            pivot = partition(list,left,right);
+
+            QuickSort(list, start_left, pivot-1);
+            QuickSort(list, pivot+1, start_right);
             }
         }
 
@@ -20,8 +22,9 @@ public class QuickSort {
         while (left<right){
             while (list.get(++left) < list.get(pivot));
             while (left < right && list.get(--right) >= list.get(pivot));
-            Collections.swap(list,right,left);
+            swap(list,right,left);
         }
+        swap(list,pivot,left);
         return left;
     }
 }
