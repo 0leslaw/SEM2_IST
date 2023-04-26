@@ -5,32 +5,43 @@ public class RadixSorter implements ISorter {
         this.checker = checker;
     }
 
-    @Override
-    public void sort(int[] values) {
-        // TODO
-        // Pamiętaj o wywołaniu checker.check(values); po kazdym wywołaniu zewnętrznej petli
-
-        int magnitude = 10;
-        int max = values[0];
+    public static int getMax(int[] values){
+        int max =0;
         for (Integer val:values) {
             if(val>max)
                 max = val;
         }
-        while (magnitude/10< max){
-            insCounter(values,magnitude);
-            magnitude*=10;
+        return max;
+    }
+    @Override
+    public void sort(int[] values) {
+
+        int max = getMax(values);
+
+        for (int i = 1; (max / i) > 0; i *= 10){
+            countSort(values, i);
             checker.check(values);
         }
-
     }
-    public static void insCounter(int[] values,int magnitude){
-        for (int i=1;i< values.length;i++){
-            int index = i;
-            while (index != 0 && values[index] % magnitude<values[index-1] % magnitude){
-                swap(index,index-1,values);
-                index--;
-            }
+    public static void countSort(int[] values,int magnitude){
+        int length = values.length;
+        int[] counter = new int[10];
+        int[] output = new int[length];
+
+        for(Integer value:values)
+            counter[(value / magnitude) % 10]++;
+
+        for(int iterator = 1;iterator<10;iterator++)
+            counter[iterator] += counter[iterator-1];
+
+        for(int iterator = length - 1; iterator >= 0; iterator--){
+            output[counter[(values[iterator]/magnitude) % 10] -1] = values[iterator];
+            counter[(values[iterator]/magnitude) % 10]--;
         }
+        for (int iterator = 0;iterator<length;iterator++)
+            values[iterator] = output[iterator];
+
+
     }
     public static void swap(int index1,int index2,int Array[]){
         int temp = Array[index1];
