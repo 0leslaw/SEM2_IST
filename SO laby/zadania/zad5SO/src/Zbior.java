@@ -20,4 +20,28 @@ public class Zbior {
     public void setZbiorSrednichWCzasie(ArrayList<Integer> zbiorSrednichWCzasie) {
         this.zbiorSrednichWCzasie = zbiorSrednichWCzasie;
     }
+
+    public ArrayList<Integer> getZbiorSrednichOdchylenWCzasie() {
+        return zbiorSrednichOdchylenWCzasie;
+    }
+
+    public void setZbiorSrednichOdchylenWCzasie(ArrayList<Integer> zbiorSrednichOdchylenWCzasie) {
+        this.zbiorSrednichOdchylenWCzasie = zbiorSrednichOdchylenWCzasie;
+    }
+
+    public int getIloscZapytan() {
+        return iloscZapytan;
+    }
+
+    public void setIloscZapytan(int iloscZapytan) {
+        this.iloscZapytan = iloscZapytan;
+    }
+
+    public int getIloscMigracji() {
+        return iloscMigracji;
+    }
+
+    public void setIloscMigracji(int iloscMigracji) {
+        this.iloscMigracji = iloscMigracji;
+    }
 }

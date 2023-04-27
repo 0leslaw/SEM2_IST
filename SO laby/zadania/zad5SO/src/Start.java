@@ -8,9 +8,9 @@ public class Start extends JFrame {
 
 //        private ramkaUstawien ramkaUstawien = new ramkaUstawien(this);
 
-    public Start(ArrayList<Zbior> zbioryWartosci) {
+    public Start(ArrayList<Zbior> zbioryWartosci,int MAX_POJ) {
         try {
-            panel_sym = new Panel_symulacji(zbioryWartosci);
+            panel_sym = new Panel_symulacji(zbioryWartosci,MAX_POJ);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (IOException | ClassNotFoundException e) {

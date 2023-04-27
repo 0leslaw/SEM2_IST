@@ -8,8 +8,10 @@ public class Procesor {
 
     public Procesor(){
     }
-    public void zwolnijProces(){
-        obciazenie -= listaProcesow.remove(0);
+    public int zwolnijProces(){
+        int temp = listaProcesow.remove(0);
+        obciazenie -= temp;
+        return temp;
     }
 
     public void dodajDoObciazenia(int wartosc){
