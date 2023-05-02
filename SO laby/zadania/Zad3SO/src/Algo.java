@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.function.Predicate;
 
 public class Algo {
     public static void FIFO(ArrayList<Integer> pagelist, int RAM_length){
