@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -29,18 +30,35 @@ public class HashMap<TKey, TValue> {
         for(int i=0;i<initialSize;i++){
             table[i] = new LinkedList<>();
         }
-
     }
 
     public void add(TKey key, TValue value) throws DuplicateKeyException {
         // TODO: Dodaj nową parę klucz-wartość. Rzuć wyjątek DuplicateKeyException, jeżeli dany klucz już istnieje w HashMap.
-        if(containsKey(key))
+        addNode(new Node(key, value));
+    }
+    public void addNode(Node node) throws DuplicateKeyException {
+        // TODO: Dodaj nową parę klucz-wartość. Rzuć wyjątek DuplicateKeyException, jeżeli dany klucz już istnieje w HashMap.
+        if(containsKey(node.key))
             throw new DuplicateKeyException();
 
-        int hashCode = hashFunction.apply(key);
+        int hashCode = hashFunction.apply(node.key);
 
         incrementCellsTakenOnCondition(hashCode % table.length);
-        table[hashCode % table.length].add(new Node(key,value));
+        table[hashCode % table.length].add(node);
+    }
+    public void rehash(Function<TKey, Integer> newHashFunction) throws DuplicateKeyException {
+        // TODO: Zmień obecną funkcję hashującą na nową (wymaga przeliczenia dla wszystkich par klucz-wartość).
+        ArrayList<Node> tempAllNodes = new ArrayList<>();
+        for(LinkedList<Node> linkedList: table)
+            for (Node node: linkedList)
+                tempAllNodes.add(node);
+
+        clear();
+        this.hashFunction = newHashFunction;
+        for (Node node: tempAllNodes){
+            addNode(node);
+        }
+
     }
 
     public void clear() {
@@ -113,7 +131,22 @@ public class HashMap<TKey, TValue> {
     public void extendTableOnCondition(){
         if(cellsTaken/(double)table.length < loadFactor)
             return;
-        table = Arrays.copyOf(table,table.length*2);
+        ArrayList<Node> tempAllNodes = new ArrayList<>();
+        for(LinkedList<Node> linkedList: table)
+            for (Node node: linkedList)
+                tempAllNodes.add(node);
+
+        table = new LinkedList[2*table.length];
+        clear();
+
+        for (Node node: tempAllNodes){
+            try {
+                addNode(node);
+            } catch (DuplicateKeyException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
     public void incrementCellsTakenOnCondition(int indexToBeCheckedForInc){
         if(table[indexToBeCheckedForInc].isEmpty()){

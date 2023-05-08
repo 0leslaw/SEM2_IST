@@ -124,6 +124,16 @@ public class HashMapTests {
         assertEquals(null, hashMap.remove(4));
         assertEquals(3, hashMap.elements());
     }
+    @org.junit.jupiter.api.Test
+    public void rehashTest() throws DuplicateKeyException {
+        var hashMap = createTestHashMap(3);
+        hashMap.rehash(key -> key % 2);
+        assertEquals(3, hashMap.elements());
+        assertEquals(5, hashMap.size());
+        assertEquals("Value1", hashMap.get(1));
+        assertEquals("Value2", hashMap.get(2));
+        assertEquals("Value3", hashMap.get(3));
+    }
 
     private HashMap<Integer, String> createTestHashMap(int elements) {
         var hashMap = new HashMap<Integer, String>(5, 0.7, key -> key);
