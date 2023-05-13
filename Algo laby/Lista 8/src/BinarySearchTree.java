@@ -16,20 +16,20 @@ public class BinarySearchTree<T extends Comparable<T>> {
         root = null;
     }
     public void add(T value) throws DuplicateElementException {
-        // TODO: Dodawanie nowej wartości do drzewa. Rzuć DuplicateElementException, jeśli element już istnieje.
+
         if(root == null) {
             root = new Node(value);
         }else
-        addToRoot(value, root);
+            addHelper(value, root);
     }
-    public void addToRoot(T value, Node root) throws DuplicateElementException {
+    public void addHelper(T value, Node root) throws DuplicateElementException {
         if(root.value.equals(value))
             throw new DuplicateElementException();
 
         if(root.value.compareTo(value) > 0)
         {
             if(root.leftChild != null)
-                addToRoot(value, root.leftChild);
+                addHelper(value, root.leftChild);
             else {
                 root.leftChild = new Node(value);
                 root.leftChild.parent = root;
@@ -38,7 +38,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
         else
         {
             if (root.rightChild != null)
-                addToRoot(value, root.rightChild);
+                addHelper(value, root.rightChild);
             else {
                 root.rightChild = new Node(value);
                 root.rightChild.parent = root;
@@ -48,23 +48,24 @@ public class BinarySearchTree<T extends Comparable<T>> {
 
 
     public boolean contains(T value) {
-        // TODO: Sprawdzenie, czy drzewo zawiera podaną wartość.
-        return searchMethod(root,value);
+        return compareSearchMethod(root,value);
     }
-    private boolean searchMethod(Node root,T value) {
-        // TODO: Zwróć wartość String reprezentującą drzewo po przejściu metodą pre-order.
+    //pomocnicza
+    private boolean compareSearchMethod(Node root, T value) {
+
         if(root != null) {
             if(root.value.equals(value))
                 return true;
             if(root.value.compareTo(value) >0)
-                return searchMethod(root.leftChild,value);
+                return compareSearchMethod(root.leftChild,value);
             else
-                return searchMethod(root.rightChild,value);
+                return compareSearchMethod(root.rightChild,value);
         }
         return false;
     }
+    //pomocnicza
     private Node searchForNode(Node root,T value) {
-        // TODO: Zwróć wartość String reprezentującą drzewo po przejściu metodą pre-order.
+
         if(root != null) {
             if(root.value.equals(value))
                 return root;
@@ -77,7 +78,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     public void delete(T value) {
-        // TODO: Usunięcie wskazanej wartości z drzewa.
+
         if(root == null)
             return;
 
@@ -149,14 +150,14 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     public String toStringPreOrder() {
-        // TODO: Zwróć wartość String reprezentującą drzewo po przejściu metodą pre-order.
+
         String returned = "";
         if(root == null)
             return returned;
         return toStringPreOrderHelper(root,returned).substring(0,toStringPreOrderHelper(root,returned).length()-2);
     }
     private String toStringPreOrderHelper(Node root,String returned) {
-        // TODO: Zwróć wartość String reprezentującą drzewo po przejściu metodą pre-order.
+
         if(root != null) {
             returned += root.toString()+", ";
             returned = toStringPreOrderHelper(root.leftChild, returned);
@@ -166,7 +167,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     public String toStringInOrder() {
-        // TODO: Zwróć wartość String reprezentującą drzewo po przejściu metodą in-order.
+
         String returned = "";
         if(root == null)
             return returned;
@@ -174,7 +175,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
 
     }
     private String toStringInOrderHelper(Node root,String returned) {
-        // TODO: Zwróć wartość String reprezentującą drzewo po przejściu metodą pre-order.
+
         if(root != null) {
             returned = toStringInOrderHelper(root.leftChild, returned);
             returned += root.toString()+", ";
@@ -184,14 +185,14 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     public String toStringPostOrder() {
-        // TODO: Zwróć wartość String reprezentującą drzewo po przejściu metodą in-order.
+
         String returned = "";
         if(root == null)
             return returned;
         return toStringPostOrderHelper(root,returned).substring(0,toStringPreOrderHelper(root,returned).length()-2);
     }
     private String toStringPostOrderHelper(Node root,String returned) {
-        // TODO: Zwróć wartość String reprezentującą drzewo po przejściu metodą pre-order.
+
         if(root != null) {
             returned = toStringPostOrderHelper(root.leftChild, returned);
             returned = toStringPostOrderHelper(root.rightChild, returned);
