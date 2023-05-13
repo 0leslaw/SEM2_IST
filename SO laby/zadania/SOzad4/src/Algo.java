@@ -1,4 +1,3 @@
-import java.lang.ref.PhantomReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -49,7 +48,7 @@ public class Algo {
             //iteracja LRU dla wszystkich procesow
             for (Proces proces:
                     processlist){
-                if(iterationLRU(proces.getPosiadane_strony(),proces.getRAM(),j))
+                if(iteracjaLRU(proces.getPosiadane_strony(),proces.getRAM(),j))
                     proces.setBledy(proces.getBledy()+1);
             }
         }
@@ -91,7 +90,7 @@ public class Algo {
             //iteracja LRU dla wszystkich procesow
             for (Proces proces:
                     processlist){
-                if(iterationLRU(proces.getPosiadane_strony(),proces.getRAM(),j))
+                if(iteracjaLRU(proces.getPosiadane_strony(),proces.getRAM(),j))
                     proces.setBledy(proces.getBledy()+1);
             }
         }
@@ -99,7 +98,7 @@ public class Algo {
     }
     public static void przydzialPriorytetowyCZESTOSCBLEDOW(ArrayList<Proces> processlist,int WSPOLNE,double WSPOLCZYNNIK_BLEDOW){
         //wspolczynnik bledow mowi jaką czescia wiekszej ilosci bledow musi byc mniejsza zeby nastapilo oddanie ramki
-        System.out.println("\nPRZYDZIAŁ PRIORYTETOWY (STEROWANIE CZĘSTOŚCIĄ BŁĘDÓW: \n");
+        System.out.println("\nPRZYDZIAŁ PRIORYTETOWY (STEROWANIE CZĘSTOŚCIĄ BŁĘDÓW): \n");
         for (Proces proces:
                 processlist) {
             proces.setRAM_LENGTH(0);
@@ -125,7 +124,7 @@ public class Algo {
             //iteracja LRU dla wszystkich procesow
             for (Proces proces:
                     processlist){
-                if(iterationLRU(proces.getPosiadane_strony(),proces.getRAM(),j))
+                if(iteracjaLRU(proces.getPosiadane_strony(),proces.getRAM(),j))
                     proces.setBledy(proces.getBledy()+1);
             }
 
@@ -153,36 +152,36 @@ public class Algo {
             //wyznaczenie zbiorow roboczych
 
             if(licznik_kwantow % ILOSC_KWANTOW_CZASU == 0 && licznik_kwantow- ILOSC_KWANTOW_CZASU >= 0)
-            for (Proces proces :
-                    processlist)
-            {
+                for (Proces proces :
+                        processlist)
+                {
 
-                    if (proces.getKtoraIteracja() < proces.getPosiadane_strony().size())
-                    {
-                        for (int i = proces.getKtoraIteracja() - ILOSC_KWANTOW_CZASU; i < proces.getKtoraIteracja(); i++)
+                        if (proces.getKtoraIteracja() < proces.getPosiadane_strony().size())
                         {
-                            hashSetUZYWANYCHSTRON.add(proces.getPosiadane_strony().get(i));
-                        }
-                        ilosc_zajetych_ramek += hashSetUZYWANYCHSTRON.size();
-                        if (ILOSC_RAMEK - ilosc_zajetych_ramek >= 0)
-                        {
-                            proces.ustawRam(hashSetUZYWANYCHSTRON.size());
+                            for (int i = proces.getKtoraIteracja() - ILOSC_KWANTOW_CZASU; i < proces.getKtoraIteracja(); i++)
+                            {
+                                hashSetUZYWANYCHSTRON.add(proces.getPosiadane_strony().get(i));
+                            }
+                            ilosc_zajetych_ramek += hashSetUZYWANYCHSTRON.size();
+                            if (ILOSC_RAMEK - ilosc_zajetych_ramek >= 0)
+                            {
+                                proces.ustawRam(hashSetUZYWANYCHSTRON.size());
+                            }
+                            else
+                            {
+                                proces.ustawRam(0);
+                                proces.setRAM_LENGTH(-1);
+                                ilosc_wylaczonych_procesow++;
+                            }
                         }
                         else
                         {
                             proces.ustawRam(0);
                             proces.setRAM_LENGTH(-1);
-                            ilosc_wylaczonych_procesow++;
                         }
-                    }
-                    else
-                    {
-                        proces.ustawRam(0);
-                        proces.setRAM_LENGTH(-1);
-                    }
-                    hashSetUZYWANYCHSTRON.clear();
+                        hashSetUZYWANYCHSTRON.clear();
 
-            }
+                }
             ilosc_zajetych_ramek = 0;
 
             if(licznik_kwantow % ILOSC_KWANTOW_CZASU == 0 && licznik_kwantow<=1000)
@@ -195,7 +194,7 @@ public class Algo {
             for (Proces proces :
                     processlist) {
                 if(proces.getRAM_LENGTH() != -1) {
-                    if (iterationLRU(proces.getPosiadane_strony(), proces.getRAM(), proces.getKtoraIteracja())) {
+                    if (iteracjaLRU(proces.getPosiadane_strony(), proces.getRAM(), proces.getKtoraIteracja())) {
                         proces.setBledy(proces.getBledy() + 1);
                     }
                     //przez to ze ta linijka byla w gornym ifie nie dzialal program
@@ -205,7 +204,7 @@ public class Algo {
         }
         wydrukWynikow(processlist);
     }
-    public static boolean iterationLRU(ArrayList<Integer> pagelist, ArrayList<Integer> RAM,int licznik_kwantow){
+    public static boolean iteracjaLRU(ArrayList<Integer> pagelist, ArrayList<Integer> RAM, int licznik_kwantow){
         boolean isfault = false;
         if(licznik_kwantow<pagelist.size()) {
             isfault = true;

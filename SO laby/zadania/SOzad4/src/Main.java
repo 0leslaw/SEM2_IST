@@ -11,7 +11,7 @@ public class Main {
         int SREDNIA_ILOSC_STRON = 2000;
         int WSPOLNE_RAMKI = 200;
         double WSPOLCZYNNIK_BLEDOW = 0.9;
-        double WSPOLCZYNNIK_BLEDOW_PRIORYTETU = 0.9;
+        double WSPOLCZYNNIK_BLEDOW_PRIORYTETU = 0.6;
 
         ArrayList<Proces> listaprocesow = new ArrayList<>();
         for(int i = 1; i<=ILOSC_PROCESOW;i++){
