@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class BinarySearchTree<T extends Comparable<T>> {
     private Node root;
     public class Node{
@@ -11,6 +13,22 @@ public class BinarySearchTree<T extends Comparable<T>> {
         public String toString(){
             return value.toString();
         }
+
+        public T getValue() {
+            return value;
+        }
+
+        public Node getParent() {
+            return parent;
+        }
+
+        public Node getLeftChild() {
+            return leftChild;
+        }
+
+        public Node getRightChild() {
+            return rightChild;
+        }
     }
     public BinarySearchTree(){
         root = null;
@@ -23,7 +41,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
             addHelper(value, root);
     }
     public void addHelper(T value, Node root) throws DuplicateElementException {
-        if(root.value.equals(value))
+        if(root.value.compareTo(value) == 0)
             throw new DuplicateElementException();
 
         if(root.value.compareTo(value) > 0)
@@ -199,5 +217,12 @@ public class BinarySearchTree<T extends Comparable<T>> {
             returned += root.toString()+", ";
         }
         return returned;
+    }
+    public boolean isEmpty(){
+        return root == null;
+    }
+
+    public Node getRoot() {
+        return root;
     }
 }

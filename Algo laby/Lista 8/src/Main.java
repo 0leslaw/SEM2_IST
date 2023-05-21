@@ -9,7 +9,7 @@ public class Main {
         tree.add(10);
         tree.add(7);
 
-        tree.delete(2);
-        System.out.println(tree.toStringPreOrder());
+
+        System.out.println(tree.toStringInOrder());
     }
 }
