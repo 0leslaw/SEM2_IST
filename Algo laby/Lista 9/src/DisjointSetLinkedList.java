@@ -1,5 +1,3 @@
-import org.w3c.dom.Node;
-
 import java.util.HashMap;
 
 public class DisjointSetLinkedList implements IDisjointSetStructure {
@@ -9,12 +7,16 @@ public class DisjointSetLinkedList implements IDisjointSetStructure {
     public class Node{
         int value;
         Node parent;
-        int rank;
+        Node next;
+        Node last;
+        int length;
 
         public Node(int stored_value){
             value = stored_value;
             parent = this;
-            rank = 0;
+            length = 1;
+            next = null;
+            last = this;
         }
     }
     public DisjointSetLinkedList(int size) {
@@ -27,9 +29,8 @@ public class DisjointSetLinkedList implements IDisjointSetStructure {
     public int findSet(int item) throws ItemOutOfRangeException {
         if(item >= SIZE || item < 0) throw new ItemOutOfRangeException();
         Node searched_root = structure.get(item);
-        while (searched_root.parent != searched_root)
-            searched_root = searched_root.parent;
-        return searched_root.value;
+
+        return searched_root.parent.value;
     }
 
     @Override
@@ -40,14 +41,23 @@ public class DisjointSetLinkedList implements IDisjointSetStructure {
         Node root1 = structure.get(findSet(item1));
         Node root2 = structure.get(findSet(item2));
 
-        if(root1.rank > root2.rank){
-            root2.parent = root1;
+        if(root1.length < root2.length){
+            joinFromRoot(root1,root2);
         }
         else
         {
-            root1.parent = root2;
-            if(root1.rank == root2.rank)
-                root2.rank++;
+            joinFromRoot(root2,root1);
         }
+    }
+    public void joinFromRoot(Node superiorRoot, Node inferiorRoot){
+        superiorRoot.last.next = inferiorRoot;
+        while (inferiorRoot.next != null){
+            inferiorRoot.parent = superiorRoot;
+            inferiorRoot = inferiorRoot.next;
+            superiorRoot.length++;
+        }
+        inferiorRoot.parent = superiorRoot;
+        superiorRoot.length++;
+        superiorRoot.last = inferiorRoot;
     }
 }

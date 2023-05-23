@@ -18,11 +18,8 @@ public class DisjointSetForest implements IDisjointSetStructure {
     public int findSet(int item) throws ItemOutOfRangeException {
         if(SIZE<=item || 0 > item) throw new ItemOutOfRangeException();
         Node searched_root = structure[item];
-        while (searched_root.parent_index != item){
-            item = searched_root.parent_index;
-            searched_root = structure[searched_root.parent_index];
-        }
-        return item;
+
+        return searched_root.parent_index;
     }
 
     @Override
@@ -33,11 +30,17 @@ public class DisjointSetForest implements IDisjointSetStructure {
         Node node2 = structure[findSet(item2)];
 
         if(node1.rank > node2.rank){
-            node2.parent_index = item1;
+            for (Node node : structure)
+                if(node.parent_index == node2.parent_index)
+                    node.parent_index = node1.parent_index;
+
         }
         else
         {
-            node1.parent_index = item2;
+            for (Node node : structure)
+                if(node.parent_index == node1.parent_index)
+                    node.parent_index = node2.parent_index;
+
             if(node1.rank == node2.rank)
                 node2.rank++;
         }
@@ -47,6 +50,14 @@ public class DisjointSetForest implements IDisjointSetStructure {
         int parent_index;
         public Node(int self_index){
             parent_index = self_index;
+        }
+
+        @Override
+        public String toString() {
+            return "Node{" +
+                    "rank=" + rank +
+                    ", parent_index=" + parent_index +
+                    '}';
         }
     }
 }

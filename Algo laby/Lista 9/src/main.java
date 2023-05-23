@@ -13,6 +13,6 @@ public class main {
         for (var i = 0; i < size; i += 8) {
             structure.union(i, i + 4);
         }
-        int i =3;
+
     }
 }
