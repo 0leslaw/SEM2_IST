@@ -1,0 +1,91 @@
+.data 
+	messageProceed: .asciiz "\n\nKontynuowac?  	\n0-nie\n1-tak\n"
+	messageChoose: .asciiz "\nPodaj kod dzialania: \n0-odejmowanie,\n1-dodawania,\n2-mno¿enie,\n3-dzielenie\n"
+	messageFirstNum: .asciiz "\nPodaj 1 liczbe\n"
+	messageSecondNum: .asciiz "\nPodaj 2 liczbe\n"
+	messageEquals: .asciiz "\nWynik: "
+
+.text
+	main:
+		#petla
+		jal checkForQuit
+		jal AskForOperation
+		jal AskAndLoadFirst
+		jal AskAndLoadSecond
+		jal calculate
+		jal printResult
+		j main
+		
+	terminate:
+		li $v0, 10
+		syscall
+		
+	checkForQuit:
+		li $v0,4
+		la $a0,messageProceed
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t0,$v0
+		
+		bne $t0,1,terminate
+		jr $ra
+	AskForOperation:
+		li $v0,4
+		la $a0,messageChoose
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t0,$v0
+			
+		jr $ra
+	AskAndLoadFirst:
+		li $v0,4
+		la $a0,messageFirstNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t1,$v0
+		
+		jr $ra
+	AskAndLoadSecond:
+		li $v0,4
+		la $a0,messageSecondNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t2,$v0
+		
+		jr $ra
+	calculate:
+		bne $t0,0,notAdd
+		add $t0,$t1,$t2
+		jr $ra
+		notAdd:
+		bne $t0,1,notSub
+		sub $t0,$t1,$t2
+		jr $ra
+		notSub:
+		bne $t0,2,notMul
+		mul $t0,$t1,$t2
+		jr $ra
+		notMul:
+		div $t0,$t1,$t2
+		jr $ra
+	printResult:
+		li $v0,4
+		la $a0,messageEquals
+		syscall
+	
+		li $v0,1
+		move $a0,$t0
+		syscall
+		
+		jr $ra
+
+		
+		

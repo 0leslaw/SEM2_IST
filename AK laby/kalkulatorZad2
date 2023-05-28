@@ -1,0 +1,103 @@
+.data 
+	messageProceed: .asciiz "\n\nKontynuowac?  	\n0-nie\n1-tak\n"
+	messageChoose: .asciiz "\nPodaj kod dzialania: \n0. (a+b)-d\n1. a-(b+c)\n2. (a-b)+c\n"
+	messageFirstNum: .asciiz "\nPodaj 1 liczbe\n"
+	messageSecondNum: .asciiz "\nPodaj 2 liczbe\n"
+	messageThirdNum: .asciiz "\nPodaj 3 liczbe\n"
+	messageEquals: .asciiz "\nWynik: "
+
+.text
+	main:
+		#petla
+		jal checkForQuit
+		jal AskForOperation
+		jal AskAndLoadFirst
+		jal AskAndLoadSecond
+		jal AskAndLoadThird
+		jal calculate
+		jal printResult
+		j main
+		
+	terminate:
+		li $v0, 10
+		syscall
+		
+	checkForQuit:
+		li $v0,4
+		la $a0,messageProceed
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t0,$v0
+		
+		bne $t0,1,terminate
+		jr $ra
+	AskForOperation:
+		li $v0,4
+		la $a0,messageChoose
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t0,$v0
+			
+		jr $ra
+	AskAndLoadFirst:
+		li $v0,4
+		la $a0,messageFirstNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t1,$v0
+		
+		jr $ra
+	AskAndLoadSecond:
+		li $v0,4
+		la $a0,messageSecondNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t2,$v0
+		
+		jr $ra
+	AskAndLoadThird:
+		li $v0,4
+		la $a0,messageThirdNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t3,$v0
+		
+		jr $ra
+	calculate:
+		bne $t0,0,case1
+		add $t0,$t1,$t2
+		sub $t4,$t0,$t3
+		jr $ra
+		case1:
+		bne $t0,1,case2
+		add $t0,$t2,$t3
+		sub $t4,$t1,$t0
+		jr $ra
+		case2:
+		sub $t0,$t1,$t2
+		add $t4,$t0,$t3
+		jr $ra
+		
+	printResult:
+		li $v0,4
+		la $a0,messageEquals
+		syscall
+	
+		li $v0,1
+		move $a0,$t4
+		syscall
+		
+		jr $ra
+
+		
+		

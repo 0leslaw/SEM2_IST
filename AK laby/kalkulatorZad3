@@ -1,0 +1,106 @@
+.data 
+	messageProceed: .asciiz "\n\nKontynuowac?  	\n0-nie\n1-tak\n"
+	messageChoose: .asciiz "\nPodaj kod dzialania: \n0. x^n\n1. x!\n"
+	messageFirstNum: .asciiz "\nPodaj 1 liczbe\n"
+	messageSecondNum: .asciiz "\nPodaj 2 liczbe\n"
+	messageEquals: .asciiz "\nWynik: "
+
+.text
+	main:
+		#petla
+		jal checkForQuit
+		jal AskForOperation
+		jal AskAndLoadFirst
+			#jesli wybrano silnie to pomijamy druga liczbe
+		beq $t0,1,skip
+		jal AskAndLoadSecond
+		skip:
+		jal calculate
+		jal printResult
+		j main
+		
+	terminate:
+		li $v0, 10
+		syscall
+		
+	checkForQuit:
+		li $v0,4
+		la $a0,messageProceed
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t0,$v0
+		
+		bne $t0,1,terminate
+		jr $ra
+		
+	AskForOperation:
+		li $v0,4
+		la $a0,messageChoose
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t0,$v0
+			
+		jr $ra
+		
+	AskAndLoadFirst:
+		li $v0,4
+		la $a0,messageFirstNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t1,$v0
+		
+		jr $ra
+		
+	AskAndLoadSecond:
+		li $v0,4
+		la $a0,messageSecondNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t2,$v0
+		
+		jr $ra
+		
+	calculate:
+
+		#t3 to iterator
+		li $t3,0
+		bne $t0,0,case1
+		li $t0,1
+			loop:
+				beq $t3,$t2,endLoop
+				mul $t0,$t0,$t1
+				addi $t3,$t3,1
+				j loop
+		endLoop:
+		jr $ra
+		case1:
+			loop1:
+				beq $t3,$t1,endLoop1
+				addi $t3,$t3,1
+				mul $t0,$t0,$t3
+				j loop1
+				
+		endLoop1:
+		jr $ra
+		
+	printResult:
+		li $v0,4
+		la $a0,messageEquals
+		syscall
+	
+		li $v0,1
+		move $a0,$t0
+		syscall
+		
+		jr $ra
+
+		
+		
