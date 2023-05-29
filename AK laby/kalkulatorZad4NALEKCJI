@@ -1,0 +1,145 @@
+.data 
+	messageProceed: .asciiz "\n\nKontynuowac?  	\n0-nie\n1-tak\n"
+	messageChoose: .asciiz "\nPodaj kod dzialania: \n0. (a+b)*d\n1. (a-b)/c\n2. (a-b)+c\n"
+	messageFirstNum: .asciiz "\nPodaj 1 liczbe\n"
+	messageSecondNum: .asciiz "\nPodaj 2 liczbe\n"
+	messageThirdNum: .asciiz "\nPodaj 3 liczbe\n"
+	messageEquals: .asciiz "\nWynik: "
+	messageException: .asciiz "\nNieprawidlowa wartosc!\n "
+	messageException1: .asciiz "\nOverflow!\n "
+
+.text
+	main:
+		#petla w której krokowo prosimy o podanie operacji, liczb i podajemy wynik
+		jal checkForQuit
+		jal AskForOperation
+		jal AskAndLoadFirst
+		jal AskAndLoadSecond
+		jal AskAndLoadThird
+		jal calculate
+		jal printResult
+		j main
+		
+	terminate:
+	#konczy program
+		li $v0, 10
+		syscall
+		
+	invalidOperationException:
+	#gdy podana operacja nie istnieje wyskakuje wyjatek
+		li $v0,4
+		la $a0,messageException
+		syscall	
+		j main
+		
+	overflowException:
+	#gdy jest overflow to podnosi sie flaga
+		li $v0,4
+		la $a0,messageException1
+		syscall	
+		j main
+		
+	checkForQuit:
+	#pytanie uzytkownika czy opuscic program
+		li $v0,4
+		la $a0,messageProceed
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t0,$v0
+		
+		bne $t0,1,terminate
+		jr $ra
+	AskForOperation:
+	#pytanie o operacje przydzielenie wyniku do rejestru $t0
+		li $v0,4
+		la $a0,messageChoose
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t0,$v0
+		
+		bgt $t0,3,invalidOperationException
+			
+		jr $ra
+	AskAndLoadFirst:
+	#pytanie o 1 liczbe zapisujemy ja do $t1
+		li $v0,4
+		la $a0,messageFirstNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t1,$v0
+		
+		jr $ra
+	AskAndLoadSecond:
+	#pytanie o 2 liczbe zapisujemy ja do $t2
+		li $v0,4
+		la $a0,messageSecondNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t2,$v0
+		
+		jr $ra
+	AskAndLoadThird:
+	#pytanie o 3 liczbe zapisujemy ja do $t3
+		li $v0,4
+		la $a0,messageThirdNum
+		syscall
+		
+		li $v0,5
+		syscall
+		move $t3,$v0
+		
+		jr $ra
+	calculate:
+	#obliczamy dzialanie
+		#sprawdzamy ktora operacje mamy wykonac
+		bne $t0,0,case1
+		#obliczenie 1 dzialania
+		add $t0,$t1,$t2
+		mfhi $t7
+		bne $t7,0,overflowException
+		mul $t4,$t0,$t3
+		mfhi $t7
+		bne $t7,0,overflowException
+		jr $ra
+		#obliczenie 2 dzialania
+		case1:
+		bne $t0,1,case2
+		sub $t0,$t1,$t2
+		mfhi $t7
+		bne $t7,0,overflowException
+		div $t4,$t0,$t3
+		mfhi $t7
+		bne $t7,0,overflowException
+		jr $ra
+		#obliczenie 3 dzialania
+		case2:
+		sub $t0,$t1,$t2
+		mfhi $t7
+		bne $t7,0,overflowException
+		add $t4,$t0,$t3
+		mfhi $t7
+		bne $t7,0,overflowException
+		jr $ra
+		
+	printResult:
+	#drukowanie wyniku
+		li $v0,4
+		la $a0,messageEquals
+		syscall
+	
+		li $v0,1
+		move $a0,$t4
+		syscall
+		
+		jr $ra
+
+		
+		

@@ -9,14 +9,14 @@ public class DisjointSetForest implements IDisjointSetStructure {
         for (int i=0;i<size;i++)
             structure[i] = new Node(i);
     }
-    public int countSets() throws ItemOutOfRangeException {
-        int numOfSets=0;
-        for (int i=0;i< structure.length;i++)
-            for (int j=0;j< structure.length;j++)
-                if (findSet(i) != findSet(j))
-                    numOfSets++;
-        return numOfSets;
-    }
+//    public int countSets() throws ItemOutOfRangeException {
+//        int numOfSets=0;
+//
+//            for (int j=0;j< structure.length;j++)
+//                if (findSet(0) != findSet(j))
+//                    numOfSets++;
+//        return numOfSets;
+//    }
 
     @Override
     public int findSet(int item) throws ItemOutOfRangeException {
@@ -29,7 +29,7 @@ public class DisjointSetForest implements IDisjointSetStructure {
     @Override
     public void union(int item1, int item2) throws ItemOutOfRangeException {
         if(item1 >= SIZE || item2 >= SIZE || item1 < 0 || item2 < 0) throw new ItemOutOfRangeException();
-        if(item1 == item2) return;
+        if(findSet(item1) == findSet(item2)) return;
         Node node1 = structure[findSet(item1)];
         Node node2 = structure[findSet(item2)];
 

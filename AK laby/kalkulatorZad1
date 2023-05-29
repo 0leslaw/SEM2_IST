@@ -1,6 +1,6 @@
 .data 
 	messageProceed: .asciiz "\n\nKontynuowac?  	\n0-nie\n1-tak\n"
-	messageChoose: .asciiz "\nPodaj kod dzialania: \n0-odejmowanie,\n1-dodawania,\n2-mno¿enie,\n3-dzielenie\n"
+	messageChoose: .asciiz "\nPodaj kod dzialania: \n0-dodawanie,\n1-odejmowanie,\n2-mno¿enie,\n3-dzielenie\n"
 	messageFirstNum: .asciiz "\nPodaj 1 liczbe\n"
 	messageSecondNum: .asciiz "\nPodaj 2 liczbe\n"
 	messageEquals: .asciiz "\nWynik: "

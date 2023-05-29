@@ -5,50 +5,43 @@ public class Graph<T> {
 
     private final int size;
     private final int[][] adjMatrix;
-    private final int[][] weightMatrix;
-    private final Map<T, Integer> vertexMap;
-    private final Map<Integer, T> reverseMap;
+    private ArrayList<T> verticesList;
 
     public Graph(List<Edge<T>> edges) {
         // TODO: Przekształcenie krawędzi na macierz sąsiedztwa, odwzorowanie wierzchołka na indeks, itp.
-        Set<T> vertices = new HashSet<>();
+        HashSet<T> vertices = new HashSet<>();
         for (Edge<T> edge : edges) {
             vertices.add(edge.getSource());
             vertices.add(edge.getDestination());
         }
         size = vertices.size();
 
-        vertexMap = new HashMap<>();
-        reverseMap = new HashMap<>();
         adjMatrix = new int[size][size];
-        weightMatrix = new int[size][size];
 
-        int index = 0;
-        for (T vertex : vertices) {
-            vertexMap.put(vertex, index);
-            reverseMap.put(index, vertex);
-            index++;
+        verticesList = new ArrayList<>();
+        T[] verticestemp = (T[]) vertices.toArray();
+        for (T o:verticestemp){
+            verticesList.add(o);
         }
 
+
         for (Edge<T> edge : edges) {
-            int srcIndex = vertexMap.get(edge.getSource());
-            int destIndex = vertexMap.get(edge.getDestination());
-            adjMatrix[srcIndex][destIndex] = 1;
-            weightMatrix[srcIndex][destIndex] = edge.getWeight();
+            int srcIndex = verticesList.indexOf(edge.getSource());
+            int destIndex = verticesList.indexOf(edge.getDestination());
+            adjMatrix[srcIndex][destIndex] = edge.getWeight();
         }
 
     }
 
     public String depthFirst(T startNode) throws NoSuchElementException {
         // TODO: Przejście przez graf metodą najpierw-wgłąb od podanego wierzchołka
+        if(!verticesList.contains(startNode))    throw new NoSuchElementException();
+
         StringBuilder result = new StringBuilder();
         boolean[] visited = new boolean[size];
         int startIndex;
 
-        if(vertexMap.containsKey(startNode))
-            startIndex = vertexMap.get(startNode);
-        else
-            throw new NoSuchElementException();
+        startIndex = verticesList.indexOf(startNode);
 
         depthFirstHelper(startIndex, visited, result);
         return result.toString();
@@ -58,9 +51,9 @@ public class Graph<T> {
         visited[vertexIndex] = true;
 
         if(result.isEmpty())
-            result.append(reverseMap.get(vertexIndex));
+            result.append(verticesList.get(vertexIndex));
         else
-            result.append(", ").append(reverseMap.get(vertexIndex));
+            result.append(", ").append(verticesList.get(vertexIndex));
 
         for (int neighborIndex = 0; neighborIndex < size; neighborIndex++) {
             int minimalWeightEdgeIndex = findMinimalWeightIndex(vertexIndex, visited);
@@ -75,11 +68,10 @@ public class Graph<T> {
         int minimalWeightEdgeIndex = Integer.MAX_VALUE;
 
         for(int i=0; i<size; i++){
-            if(adjMatrix[vertexIndex][i] == 1
-                    && weightMatrix[vertexIndex][i] < minimalWeightEdge
-                    && weightMatrix[vertexIndex][i] != 0
+            if(adjMatrix[vertexIndex][i] > 0
+                    && adjMatrix[vertexIndex][i] < minimalWeightEdge
                     && !visited[i]){
-                minimalWeightEdge = weightMatrix[vertexIndex][i];
+                minimalWeightEdge = adjMatrix[vertexIndex][i];
                 minimalWeightEdgeIndex = i;
             }
         }
@@ -89,14 +81,13 @@ public class Graph<T> {
 
     public String breadthFirst(T startNode) throws NoSuchElementException {
         // TODO: Przejście przez graf metodą najpierw-wszerz od podanego wierzchołka
+        if(!verticesList.contains(startNode))   throw new NoSuchElementException();
+
         StringBuilder result = new StringBuilder();
         boolean[] visited = new boolean[size];
 
         int startIndex;
-        if(vertexMap.containsKey(startNode))
-            startIndex = vertexMap.get(startNode);
-        else
-            throw new NoSuchElementException();
+        startIndex = verticesList.indexOf(startNode);
 
         Queue<Integer> queue = new LinkedList<>();
         visited[startIndex] = true;
@@ -106,9 +97,9 @@ public class Graph<T> {
             int vertexIndex = queue.poll();
 
             if(result.isEmpty())
-                result.append(reverseMap.get(vertexIndex));
+                result.append(verticesList.get(vertexIndex));
             else
-                result.append(", ").append(reverseMap.get(vertexIndex));
+                result.append(", ").append(verticesList.get(vertexIndex));
 
             for (int i = 0; i < size; i++) {
                 int minimalWeightEdgeIndex = findMinimalWeightIndex(vertexIndex ,visited);
@@ -125,12 +116,15 @@ public class Graph<T> {
     public int connectedComponents() throws ItemOutOfRangeException {
         // TODO: Liczba składowych spójnych grafu
         DisjointSetForest disjointSet = new DisjointSetForest(size);
+        int numOfUnions = 0;
         for (int i = 0; i < size; i++) {
-            for (int j = i + 1; j < size; j++) {
-                if (adjMatrix[i][j] == 1)
+            for (int j = 0; j < size; j++) {
+                if (adjMatrix[i][j] > 0 && disjointSet.findSet(i) != disjointSet.findSet(j)) {
                     disjointSet.union(i, j);
+                    numOfUnions++;
+                }
             }
         }
-        return disjointSet.countSets();
+        return size-numOfUnions;
     }
 }
