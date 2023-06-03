@@ -1,0 +1,76 @@
+.data
+input: .space 51   # Tablica na przechowanie wiadomoœci #input
+output: .space 51   # Tablica na przechowanie wiadomoœci #output albo na odwrot
+key: .word 0   # Klucz przesuniêcia
+chosenOperation: .space 20
+prompt1: .asciiz "S - szyfrowanie, D - deszyfrowanie: "
+prompt2: .asciiz "Podaj klucz: "
+prompt3: .asciiz "Wprowadz tekst: "
+
+.text
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, prompt1
+  	syscall 
+  	la $a0,chosenOperation	#pobranie operacji od usera
+  	la $a1,key		#zaladowanie jako argumentu buforu "key"	
+  	li $v0,8		#mówi syscallowi zeby przeprowadzic pobranie tekstu od usera
+  	syscall 
+  	lb $s1,0($a0)		#wczytanie bajtu znaku operacji do $s1
+ 
+  	li $v0, 4	#4 odpowiada za wyswietlenie
+  	la $a0, prompt2
+  	syscall 
+  	li $v0, 5	# Wczytanie klucza przesuniêcia
+  	syscall
+  	move $t0,$v0
+  	bne $s1,68,skipChangingToDecription	#jesli wymagana jest dekrypcja to zmienimy key na 26 - key
+  	li $t1,26
+  	sub $t0,$t1,$t0
+  	skipChangingToDecription:
+  	sw $t0, key
+ 
+
+  	li $v0, 4	#4 odpowiada za wyswietlenie
+  	la $a0, prompt3
+  	syscall	#wywolanie funkcji
+  	li $v0, 8	# Wczytanie wiadomoœci
+  	la $a0, input
+  	li $a1, 51	#operacja pobrania tekstu
+  	syscall
+
+	encryption:
+		li $t0, 0	# offset znaku w inpucie
+		li $t3,0	# offset znaku w outpucie
+		lb $t1, key	# klucz szyfrowania
+		
+		loop:
+			lb $t2,input($t0)	#wczytanie byte znaku przesunietego o wartosc $t0 z RAM do rej $t2
+			beqz $t2,endProgram
+			
+			blt $t2,65,prepareNextIteration	#sprawdzamy czy litera w tej operacji jest w zakresie alfabetu
+			bgt $t2,90,prepareNextIteration
+			
+			subi $t2,$t2,65	#wyskalowanie 1 znaku z 65 pozycji do 0 w celu wykonania poprawnie operacji modulo
+			add $t2,$t2,$t1	#dodanie klucza przeksztalcen
+			rem $t2,$t2,26	#modulo
+			addi $t2,$t2,65	#przywrocenie kodu tego bajtu do standardu ASCII
+			
+			sb $t2,output($t3)
+			addi $t3,$t3,1 
+			prepareNextIteration:
+				addi $t0,$t0,1
+				j loop
+			
+	endProgram:
+		li $v0, 4	#4 odpowiada za wyswietlenie
+ 		la $a0, output
+  		syscall		#wywolanie funkcji
+		
+		li $v0,10
+		syscall	
+			
+			
+			
+			
+			
+	
