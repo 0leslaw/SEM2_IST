@@ -149,7 +149,7 @@ public class GraphTests {
         var graph = createTestGraph();
         assertThrows(NoSuchElementException.class, () -> graph.breadthFirst("doesn't exist"));
     }
-
+//blad
     @Test
     public void connectedComponents() throws ItemOutOfRangeException {
         var graph = createTestGraph();
