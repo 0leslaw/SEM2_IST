@@ -1,6 +1,6 @@
 .data
-input: .space 51   # Tablica na przechowanie wiadomoœci #input
-output: .space 51   # Tablica na przechowanie wiadomoœci #output albo na odwrot
+input: .space 50   # Tablica na przechowanie wiadomoœci #input
+output: .space 50   # Tablica na przechowanie wiadomoœci #output albo na odwrot
 key: .word 0   # Klucz przesuniêcia
 chosenOperation: .space 20
 prompt1: .asciiz "S - szyfrowanie, D - deszyfrowanie: "
