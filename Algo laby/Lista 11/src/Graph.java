@@ -34,70 +34,67 @@ public class Graph<T> {
         Map<T,Integer> shortestPathsMap = new HashMap<>(ammountOfVerts-1);
 
         T endNode;
-        int distance;
+
         for (int index = 0;index < ammountOfVerts;index++)
-            if (indexToValue.get(index) != startNode){
-
+// koment bo albo bedziemy zliczac droge tez dla startNode i usuniemy go na koniec, albo bedziemy przekazywac go do kazdej F
+            // if (indexToValue.get(index) != startNode)
+            {
                 endNode = indexToValue.get(index);
-                distance = dijkstraDistance(startNode,endNode);
-
-                shortestPathsMap.put(endNode,distance);
+                shortestPathsMap.put(endNode,Integer.MAX_VALUE);
             }
 
+        boolean[] visited = new boolean[ammountOfVerts];
+        Arrays.fill(visited,false);
+        T currentNode = startNode;
+        updateDistancesForStrartNode(shortestPathsMap,currentNode,visited);
+        currentNode = findMinDis(shortestPathsMap,visited);
+        while(currentNode != null){
+            updateDistances(shortestPathsMap,currentNode,visited);
+            currentNode = findMinDis(shortestPathsMap,visited);
+        }
+        shortestPathsMap.remove(startNode);
         return shortestPathsMap;
     }
-    public void updateDistances(Node visitedRoot,HashMap<Integer,Node> indexToNode,int indexOfVisited){
-        visitedRoot.visited = true;
+
+    private T findMinDis(Map<T, Integer> shortestPathsMap, boolean[] visited) {
+        T min = null;
+            for (int i=0;i<ammountOfVerts;i++){
+                if(!visited[i] && (min == null || shortestPathsMap.get(indexToValue.get(i))<shortestPathsMap.get(min))){
+                    min = indexToValue.get(i);
+                }
+            }
+            return min;
+    }
+
+    private void updateDistances(Map<T, Integer> shortestPathsMap,T currentNode, boolean[] visited) {
+        int indexOfVisited = valueToIndex.get(currentNode);
+        visited[indexOfVisited] = true;
         int weightBetweenVisitedAndDest;
         for (int destinationIndex = 0;destinationIndex<ammountOfVerts;destinationIndex++){
 
             weightBetweenVisitedAndDest = adjMatrix[indexOfVisited][destinationIndex];
-            Node destinationNode = indexToNode.get(destinationIndex);
 
-            if (weightBetweenVisitedAndDest>0 && visitedRoot.distance + weightBetweenVisitedAndDest < destinationNode.distance){
-                destinationNode.distance = visitedRoot.distance + weightBetweenVisitedAndDest;
-                destinationNode.linkedToThisWhenShorteningDistance = visitedRoot;
-            }
+            if (weightBetweenVisitedAndDest != 0 &&
+                    shortestPathsMap.get(currentNode) + weightBetweenVisitedAndDest
+                            < shortestPathsMap.get(indexToValue.get(destinationIndex)))
+                shortestPathsMap.replace(indexToValue.get(destinationIndex),shortestPathsMap.get(currentNode) + weightBetweenVisitedAndDest);
+
+
         }
     }
-    public Node findMinDistance(HashMap<Integer,Node> indexToNode,HashMap<Node,Integer> NodeToIndex){
-        //dajac tu nulla upewniam sie ze pierwszy min nie jest visited
-        Node min = new Node(null);
-        for (int index = 0;index < ammountOfVerts;index++)
-            if (min.distance > indexToNode.get(index).distance && !indexToNode.get(index).visited)
-                min = indexToNode.get(index);
+    private void updateDistancesForStrartNode(Map<T, Integer> shortestPathsMap,T currentNode, boolean[] visited) {
+        int indexOfVisited = valueToIndex.get(currentNode);
+        visited[indexOfVisited] = true;
+        int weightBetweenVisitedAndDest;
+        for (int destinationIndex = 0;destinationIndex<ammountOfVerts;destinationIndex++){
 
-        return min;
-    }
-    public int dijkstraDistance(T startLabel,T endLabel){
-        int startIndex = valueToIndex.get(startLabel);
-        int endIndex = valueToIndex.get(endLabel);
+            weightBetweenVisitedAndDest = adjMatrix[indexOfVisited][destinationIndex];
 
-        HashMap<Integer,Node> indexToNode = new HashMap<>(ammountOfVerts);
-        HashMap<Node,Integer> NodeToIndex = new HashMap<>(ammountOfVerts);
+            if (weightBetweenVisitedAndDest != 0)
+                shortestPathsMap.replace(indexToValue.get(destinationIndex),weightBetweenVisitedAndDest);
 
-        for (int index = 0;index < ammountOfVerts;index++){
-            Node temp = new Node(indexToValue.get(index));
-            indexToNode.put(index,temp);
-            NodeToIndex.put(temp,index);
-        }
 
-        Node currentNode = indexToNode.get(startIndex);
-        currentNode.distance = 0;
-        while (indexToNode.get(endIndex) != currentNode){
-            updateDistances(currentNode,indexToNode,NodeToIndex.get(currentNode));
-            currentNode = findMinDistance(indexToNode,NodeToIndex);
-        }
-        return indexToNode.get(endIndex).distance;
-    }
-    public class Node{
-        private Node linkedToThisWhenShorteningDistance = null;
-        private int distance = Integer.MAX_VALUE;
-        private boolean visited = false;
-        private T label;
-
-        public Node(T label) {
-            this.label = label;
         }
     }
+
 }

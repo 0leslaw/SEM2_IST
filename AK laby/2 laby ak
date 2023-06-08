@@ -16,19 +16,26 @@ prompt3: .asciiz "Wprowadz tekst: "
   	li $v0,8		#mówi syscallowi zeby przeprowadzic pobranie tekstu od usera
   	syscall 
   	lb $s1,0($a0)		#wczytanie bajtu znaku operacji do $s1
- 
+ 	
+ 	#sprawdzam czy jest S lub D
+ 	beq $s1,68,skipCheckException
+ 	bne $s1,83,exception
+ 	
+ 	skipCheckException:
   	li $v0, 4	#4 odpowiada za wyswietlenie
   	la $a0, prompt2
   	syscall 
   	li $v0, 5	# Wczytanie klucza przesuniêcia
   	syscall
   	move $t0,$v0
+  	
   	bne $s1,68,skipChangingToDecription	#jesli wymagana jest dekrypcja to zmienimy key na 26 - key
   	li $t1,26
   	sub $t0,$t1,$t0
   	skipChangingToDecription:
   	sw $t0, key
- 
+ 	
+ 	
 
   	li $v0, 4	#4 odpowiada za wyswietlenie
   	la $a0, prompt3
@@ -47,6 +54,12 @@ prompt3: .asciiz "Wprowadz tekst: "
 			lb $t2,input($t0)	#wczytanie byte znaku przesunietego o wartosc $t0 z RAM do rej $t2
 			beqz $t2,endProgram
 			
+			#zamiana na CAPS
+			blt $t2,97,skipToCaps
+			bgt $t2,122,skipToCaps
+			addi $t2,$t2,-32
+			
+			skipToCaps:
 			blt $t2,65,prepareNextIteration	#sprawdzamy czy litera w tej operacji jest w zakresie alfabetu
 			bgt $t2,90,prepareNextIteration
 			
@@ -69,7 +82,10 @@ prompt3: .asciiz "Wprowadz tekst: "
 		li $v0,10
 		syscall	
 			
-			
+	exception:
+	
+		li $v0,10
+		syscall	
 			
 			
 			
