@@ -7,7 +7,6 @@ public class IterativeMergeSorter implements ISorter {
 
     @Override
     public void sort(int[] values) {
-        // TODO
         // Pamiętaj o wywołaniu checker.check(values); po kazdym wywołaniu zewnętrznej petli
         int next_subArr_size = 2;
 
@@ -27,8 +26,8 @@ public class IterativeMergeSorter implements ISorter {
 
     public void merge(int[] arr,int left,int mid,int right){
         int[] aux_array = new int[right-left+1];
-        int l_start = left;
         int m_start = mid;
+        int l_start = left;
         int array_counter = 0;
         while(left < m_start && mid <= right){
             if(arr[left] < arr[mid])

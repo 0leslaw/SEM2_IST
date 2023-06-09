@@ -3,8 +3,8 @@ import org.w3c.dom.Node;
 import java.util.HashMap;
 
 public class DisjointSetForest implements IDisjointSetStructure {
-    Node[] structure;
     private final int SIZE;
+    Node[] structure;
 
 
     public DisjointSetForest(int size) {

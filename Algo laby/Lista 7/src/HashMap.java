@@ -7,8 +7,8 @@ import java.util.function.Function;
 public class HashMap<TKey, TValue> {
     private LinkedList<Node>[] table;
     private Function<TKey, Integer> hashFunction;
-    private int cellsTaken = 0;
     private double loadFactor;
+    private int cellsTaken = 0;
 
     public class Node{
         TKey key;

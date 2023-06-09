@@ -4,8 +4,8 @@ import com.company.exceptions.FullStackException;
 import java.util.EmptyStackException;
 
 public class ArrayStack<T> implements IStack<T>{
-    private final int CAPACITY;
     T array[];
+    private final int CAPACITY;
     int top_index;
 
     public ArrayStack(int capacity) {

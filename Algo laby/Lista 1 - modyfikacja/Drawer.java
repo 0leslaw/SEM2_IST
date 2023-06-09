@@ -2,7 +2,6 @@ package com.company;
 
 public class Drawer {
     public static void drawRectangle(int width, int height) {
-        // TODO
         String top_bottom = "";
         String middle = "#";
 
