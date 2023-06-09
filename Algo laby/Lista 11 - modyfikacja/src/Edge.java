@@ -4,9 +4,9 @@ public class Edge<T> {
     private int distance;
 
     public Edge(T node1, T node2, int distance) {
+        this.distance = distance;
         this.node1 = node1;
         this.node2 = node2;
-        this.distance = distance;
     }
 
     public T getNode1() {
