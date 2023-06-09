@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class TwoWayLinkedList<T> {
-    private Node sentinel;
     private Node last_node;
+    private Node sentinel;
     private int size = 0;
 
     public TwoWayLinkedList() {
