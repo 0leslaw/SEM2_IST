@@ -168,7 +168,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     public String toStringPreOrder() {
-
         String returned = "";
         if(root == null)
             return returned;
