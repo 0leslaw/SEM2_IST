@@ -2,7 +2,6 @@ package com.company;
 
 public class Drawer {
     public static void drawTriangle(int size) {
-        // TODO
         if(size>0) {
             String temp = "";
             for (int i = 1; i < size + 1; i++) {
@@ -13,7 +12,6 @@ public class Drawer {
     }
 
     public static void drawSquare(int size) {
-        // TODO
         if(size ==1)
             System.out.println("#");
         else if(size>0) {
@@ -30,14 +28,12 @@ public class Drawer {
     }
 
     public static void drawPyramid(int size) {
-        // TODO
         if(size>0)
         drawPyramidWithOffset(size,0);
         else System.out.println("fail");
     }
 
     public static void drawPyramidWithOffset(int size,int offset) {
-        // TODO
         String temp = "";
         for(int i=1; i<size+1; i++){
             temp = temp + returnCharSeq(size-i+offset," ");
@@ -49,7 +45,6 @@ public class Drawer {
 
 
     public static void drawChristmasTree(int size) {
-        // TODO
         if(size>0)
         for(int i = 0; i<size ; i++)
             drawPyramidWithOffset(i+1,size-i-1);
