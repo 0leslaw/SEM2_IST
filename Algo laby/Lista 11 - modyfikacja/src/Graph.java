@@ -29,12 +29,10 @@ public class Graph<T> {
     }
 
     public Integer calculateShortestPath(T startNode, T endNode) throws NoSuchElementException {
-        // TODO: Wylicz najkrótszą ścieżkę pomiędzy wierzchołkami w grafie
         if(!valueToIndex.containsKey(startNode) || !valueToIndex.containsKey(endNode)) throw new NoSuchElementException();
         return dijkstraDistance(startNode,endNode);
     }
     public Map<Integer,T> findShortestRoute(T startNode, T endNode) throws NoSuchElementException {
-        // TODO: Wylicz najkrótszą ścieżkę pomiędzy wierzchołkami w grafie
         if(!valueToIndex.containsKey(startNode) || !valueToIndex.containsKey(endNode)) throw new NoSuchElementException();
         return dijkstraRoute(startNode,endNode);
     }
