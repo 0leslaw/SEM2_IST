@@ -1,0 +1,120 @@
+.data
+input1: .space 50   # Tablica na przechowanie instrukcji
+input2: .space 50   # Tablica na przechowanie instrukcji
+input3: .space 50   # Tablica na przechowanie instrukcji
+input4: .space 50   # Tablica na przechowanie instrukcji
+input5: .space 50   # Tablica na przechowanie instrukcji
+buffor: .space 50   # Tablica na przechowanie kolejnych wordów na stos
+bufforNormalized: .space 50   # Tablica na przechowanie kolejnych wordów na stos
+
+promptPassIns: .asciiz "Podaj instrukcje nr "
+newLine: .asciiz "\n"
+promptTryAgain: .asciiz "Nieprawid³owa instrukcja, try again\n"
+
+.text
+
+li $s0,1	#index zew pêtli
+rootLoop:
+	li $s1,0 	#offset do sprawdzania normalizowanego buforu
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, promptPassIns
+  	syscall 
+  	
+  	li $v0, 1 	#4 odpowiada za wyswietlenie
+  	move $a0, $s0
+  	syscall	
+  	
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, newLine
+  	syscall 
+  	
+  	li $v0,8	#mówi syscallowi zeby przeprowadzic pobranie tekstu od usera
+  	la $a0, buffor
+  	li $t0,50	#podajemy max dlugosc
+  	move $a1, $t0
+  	syscall 
+  	
+  	li $t0, -1 
+  	li $t1,-1
+ 	normalizeLoop:
+ 	addi $t0,$t0,1
+ 	lb $t2,buffor($t0)
+ 	beqz $t2,endNormalizeLoop
+ 	beq $t2,32,normalizeLoop	#usuwamy spacje i tab
+	beq $t2,9,normalizeLoop		
+	beq $t2,11,normalizeLoop
+	
+	addi $t1,$t1,1
+	sb $t2,bufN($t1)
+	j normalizeLoop
+	endNormalizeLoop:				
+ 	li $t0, 0 
+ 	li $t1, 0 
+ 	
+ 	lw $t0,bufN($s1)
+ 	addi $s1,$s1,1
+ 	#szukam instrukcji w drzewie
+ 	beq $t0,65,checkForA
+ 	beq $t0,74,checkForJ
+ 	beq $t0,77,checkForM
+ 	beq $t0,78,checkForN
+ 	
+ 	#nieprawid³owe dane
+ 	incD:
+ 	jal clrBuffer
+ 	j rootLoop
+ 	
+ 	checkedInstructionCorrect:
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	endProgram:
+ 		li $v0,10
+ 		syscall
+			
+	clrBuffer:
+			# Wyczyœæ bufor
+    		la $t0, buffor     # Za³aduj adres bufora do $t0
+    		li $t1, 0            # Za³aduj wartoœæ zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks pêtli)
+    
+    		clear_loop:
+        		sb $t1, ($t0)    # Ustaw wartoœæ zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks pêtli
+        
+        		# SprawdŸ warunek zakoñczenia pêtli
+        		bne $t2, 100, clear_loop		
+	
+		jr $ra
+	checkForA:
+		lb $t0,bufN($s1)
+		bne $t0,68,incD
+		addi $s1,$s1,1
+		
+		lb $t0,bufN($s1)
+		bne $t0,68,incD
+		addi $s1,$s1,1
+		
+		lb $t0,bufN($s1)
+		beq $t0,36,iTiSADD
+		beq $t0,73,iTiSADDI
+		
+		j incD
+	iTiSADD:
+	# zapisz na stacku info o instrukcji
+		jr $ra
+	iTiSADDI:
+		jr $ra
+	checkForJ:
+		lb $t0,bufN($s1)
+		bne $t0,68,incD
+		addi $s1,$s1,1
+		j incD
+	checkForM:
+		j incD
+	checkForN:
+		j incD
