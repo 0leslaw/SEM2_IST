@@ -4,8 +4,8 @@ import java.util.*;
 public class Graph<T> {
 
     private int size;
-    private int[][] adjMatrix;
     private ArrayList<T> verticesList;
+    private int[][] adjMatrix;
 
     public Graph(List<Edge<T>> edges) {
         HashSet<T> vertices = new HashSet<>();
