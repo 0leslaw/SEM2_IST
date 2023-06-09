@@ -5,8 +5,8 @@ input3: .space 50   # Tablica na przechowanie instrukcji
 input4: .space 50   # Tablica na przechowanie instrukcji
 input5: .space 50   # Tablica na przechowanie instrukcji
 buffor: .space 50   # Tablica na przechowanie kolejnych wordów na stos
-bufforNormalized: .space 50   # Tablica na przechowanie kolejnych wordów na stos
-
+bufN: .space 50   # Tablica na przechowanie kolejnych wordów na stos
+bufWord: .space 50
 promptPassIns: .asciiz "Podaj instrukcje nr "
 newLine: .asciiz "\n"
 promptTryAgain: .asciiz "Nieprawid³owa instrukcja, try again\n"
@@ -40,6 +40,7 @@ rootLoop:
  	addi $t0,$t0,1
  	lb $t2,buffor($t0)
  	beqz $t2,endNormalizeLoop
+ 	beq $t2,10,endNormalizeLoop
  	beq $t2,32,normalizeLoop	#usuwamy spacje i tab
 	beq $t2,9,normalizeLoop		
 	beq $t2,11,normalizeLoop
@@ -54,6 +55,8 @@ rootLoop:
  	lw $t0,bufN($s1)
  	addi $s1,$s1,1
  	#szukam instrukcji w drzewie
+ 		# WAZNE!!! JESLI UDA SIE ZNALEZC OPERACJE TO W $s2 BEDZIE INFO ILE MA BYC PARAMETROW
+ 		# A W $s3 BEDZIE ID OPERACJI KOLEJNO JAK W ZADANIU
  	beq $t0,65,checkForA
  	beq $t0,74,checkForJ
  	beq $t0,77,checkForM
@@ -62,6 +65,10 @@ rootLoop:
  	#nieprawid³owe dane
  	incD:
  	jal clrBuffer
+ 	jal clrWordBuffer
+ 	li $v0,8
+ 	la $a0,promptTryAgain
+ 	syscall
  	j rootLoop
  	
  	checkedInstructionCorrect:
@@ -74,6 +81,119 @@ rootLoop:
  		li $v0,10
  		syscall
 			
+	
+	checkForA:
+		sb $t0,bufWord($0)
+		
+		lb $t0,bufN($s1)
+		bne $t0,68,incD
+		sb $t0,bufWord($s1)	# jesli mamy oczekiwana literke to od razu ja wpisujemy
+		addi $s1,$s1,1		# kolejny indeks stringa
+		
+		lb $t0,bufN($s1)
+		bne $t0,68,incD
+		sb $t0,bufWord($s1)	# w tym miejscu doda sie drugie 'D' 
+		addi $s1,$s1,1
+		
+		lb $t0,bufN($s1)
+		beq $t0,36,iTiSADD
+		beq $t0,73,iTiSADDI
+		
+		j incD
+	iTiSADD:
+	# zapisz na stacku info o instrukcji
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj¹ ale kod mialby 500 linijek jakby wszystko obsluzyc
+		lb $t0,buffor($s1)
+		bne $t0,32,incD
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWord($s1)
+		li $t0,36
+		addi $s1,$s1,1
+		sb $t0,bufWord($s1)	#zapis znaczka $
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufN($s1)
+		addi $s1,$s1,1	#s1 = 5
+		lb $t1,bufN($s1)
+		#sprawdzamy kol arg
+		move $s3,$s1	#pomocniczy iterator buforowanej instrukcji
+		jal checkIfRegIndOK
+		sb $t0,bufWord($s3)
+		bne $t1,44,skipSecDig
+		addi $s3,$s3,1
+		addi $s1,$s1,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWord($s1)
+		skipSecDig:
+		addi $s3,$s3,1
+		addi $s1,$s1,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWord($s3)
+		li $t0,36
+		addi $s3,$s3,1
+		sb $t0,bufWord($s3)	#zapis znaczka $
+		
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufN($s1)
+		addi $s1,$s1,1
+		lb $t1,bufN($s1)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOK
+		sb $t0,bufWord($s3)
+		bne $t1,44,skipSecDig1
+		addi $s3,$s3,1
+		addi $s1,$s1,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWord($s1)
+		skipSecDig1:
+		addi $s3,$s3,1
+		addi $s1,$s1,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWord($s3)
+		li $t0,36
+		addi $s3,$s3,1
+		sb $t0,bufWord($s3)	#zapis znaczka $
+		
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufN($s1)
+		addi $s1,$s1,1
+		lb $t1,bufN($s1)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKLastArg
+		sb $t0,bufWord($s3)
+		bne $t1,44,skipSecDig2
+		addi $s3,$s3,1
+		addi $s1,$s1,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWord($s1)
+		skipSecDig2:
+		addi $s3,$s3,1
+		addi $s1,$s1,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWord($s3)
+		li $t0,36
+		addi $s3,$s3,1
+		sb $t0,bufWord($s3)	#zapis znaczka $
+		
+		lw $t0,bufWord($0)  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-1
+		
+		move $ra,$t4  
+		jr $ra
+	iTiSADDI:
+		jr $ra
+	checkForJ:
+		lb $t0,bufN($s1)
+		bne $t0,68,incD
+		addi $s1,$s1,1
+		j incD
+	checkForM:
+		j incD
+	checkForN:
+		j incD
+		
+		
 	clrBuffer:
 			# Wyczyœæ bufor
     		la $t0, buffor     # Za³aduj adres bufora do $t0
@@ -87,34 +207,81 @@ rootLoop:
         		addi $t2, $t2, 1 # Inkrementuj indeks pêtli
         
         		# SprawdŸ warunek zakoñczenia pêtli
-        		bne $t2, 100, clear_loop		
-	
+        		bne $t2, 50, clear_loop		
+		# Wyczyœæ buforNorm
+    		la $t0, bufN     # Za³aduj adres bufora do $t0
+    		li $t1, 0            # Za³aduj wartoœæ zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks pêtli)
+    
+    		clear_loop1:
+        		sb $t1, ($t0)    # Ustaw wartoœæ zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks pêtli
+        
+        		# SprawdŸ warunek zakoñczenia pêtli
+        		bne $t2, 50, clear_loop1
 		jr $ra
-	checkForA:
-		lb $t0,bufN($s1)
-		bne $t0,68,incD
-		addi $s1,$s1,1
+	clrWordBuffer:
+			# Wyczyœæ bufor s³owa
+    		la $t0, bufWord     # Za³aduj adres bufora do $t0
+    		li $t1, 0            # Za³aduj wartoœæ zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks pêtli)
+    
+    		clear_loop2:
+        		sb $t1, ($t0)    # Ustaw wartoœæ zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks pêtli
+        
+        		# SprawdŸ warunek zakoñczenia pêtli
+        		bne $t2, 4, clear_loop2	
 		
-		lb $t0,bufN($s1)
-		bne $t0,68,incD
-		addi $s1,$s1,1
-		
-		lb $t0,bufN($s1)
-		beq $t0,36,iTiSADD
-		beq $t0,73,iTiSADDI
-		
-		j incD
-	iTiSADD:
-	# zapisz na stacku info o instrukcji
 		jr $ra
-	iTiSADDI:
-		jr $ra
-	checkForJ:
-		lb $t0,bufN($s1)
-		bne $t0,68,incD
-		addi $s1,$s1,1
-		j incD
-	checkForM:
-		j incD
-	checkForN:
-		j incD
+	checkIfRegIndOK:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,44,twoDigitNum
+			blt $t0,48,incD
+			bgt $t0,57,incD
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNum:
+			blt $t0,49,incD
+			bgt $t0,51,incD
+			
+			blt $t1,48,incD
+			beq $t0,3,checkForMax2
+			bgt $t1,57,incD
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMax2:
+			bgt $t1,50,incD
+			
+			li $t3,2
+			jr $ra
+			
+	checkIfRegIndOKLastArg:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,00,twoDigitNum1
+			blt $t0,48,incD
+			bgt $t0,57,incD
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNum1:
+			blt $t0,49,incD
+			bgt $t0,51,incD
+			
+			blt $t1,48,incD
+			beq $t0,3,checkForMax21
+			bgt $t1,57,incD
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMax21:
+			bgt $t1,50,incD
+			
+			li $t3,2
+			jr $ra		
+			
+			
