@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 // Proszę nie modyfikować tego pliku!
 public class Checker implements IChecker {
-    private List<int[]> steps;
     private int checksInvoked;
+    private List<int[]> steps;
 
 
     public Checker(List<int[]> steps) {
