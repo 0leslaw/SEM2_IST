@@ -1,10 +1,10 @@
 import java.util.*;
 
 public class Graph<T> {
-    private int[][] adjMatrix;
     private HashMap<Integer,T> indexToValue = new HashMap<>();
     private HashMap<T,Integer> valueToIndex = new HashMap<>();
     private int ammountOfVerts;
+    private int[][] adjMatrix;
 
 
     public Graph(List<Edge<T>> edges) {
