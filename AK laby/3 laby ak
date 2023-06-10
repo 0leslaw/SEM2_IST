@@ -1,21 +1,27 @@
-.data
-input1: .space 50   # Tablica na przechowanie instrukcji
-input2: .space 50   # Tablica na przechowanie instrukcji
-input3: .space 50   # Tablica na przechowanie instrukcji
-input4: .space 50   # Tablica na przechowanie instrukcji
-input5: .space 50   # Tablica na przechowanie instrukcji
-buffor: .space 50   # Tablica na przechowanie kolejnych wordów na stos
-bufN: .space 50   # Tablica na przechowanie kolejnych wordów na stos
-bufWord: .space 50
+ .data
+
+bufforPW: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufNPW: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufWordPW: .space 24
+bufforDR: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufNDR: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufWordDR: .space 24
+bufforTRZ: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufNTRZ: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufWordTRZ: .space 24
+bufforCZT: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufNCZT: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufWordCZT: .space 24
+bufforPT: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufNPT: .space 24   # Tablica na przechowanie kolejnych word?w na stos
+bufWordPT: .space 24
 promptPassIns: .asciiz "Podaj instrukcje nr "
 newLine: .asciiz "\n"
-promptTryAgain: .asciiz "Nieprawid³owa instrukcja, try again\n"
-
+promptTryAgain: .asciiz "Nieprawid?owa instrukcja, try again\n"
 .text
-
-li $s0,1	#index zew pêtli
-rootLoop:
-	li $s1,0 	#offset do sprawdzania normalizowanego buforu
+li $s0,1	#index zew p?tli
+rootLoopPW:
+	li $t7,0 	#offset do sprawdzania normalizowanego buforu
   	li $v0, 4 	#4 odpowiada za wyswietlenie
   	la $a0, promptPassIns
   	syscall 
@@ -28,260 +34,2620 @@ rootLoop:
   	la $a0, newLine
   	syscall 
   	
-  	li $v0,8	#mówi syscallowi zeby przeprowadzic pobranie tekstu od usera
-  	la $a0, buffor
-  	li $t0,50	#podajemy max dlugosc
+  	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
+  	la $a0, bufforPW
+  	li $t0,24	#podajemy max dlugosc
   	move $a1, $t0
   	syscall 
   	
   	li $t0, -1 
   	li $t1,-1
- 	normalizeLoop:
+ 	normalizeLoopPW:
  	addi $t0,$t0,1
- 	lb $t2,buffor($t0)
- 	beqz $t2,endNormalizeLoop
- 	beq $t2,10,endNormalizeLoop
- 	beq $t2,32,normalizeLoop	#usuwamy spacje i tab
-	beq $t2,9,normalizeLoop		
-	beq $t2,11,normalizeLoop
+ 	lb $t2,bufforPW($t0)
+ 	beqz $t2,endNormalizeLoopPW
+ 	beq $t2,10,endNormalizeLoopPW
+ 	beq $t2,32,normalizeLoopPW	#usuwamy spacje i tab
+	beq $t2,9,normalizeLoopPW		
+	beq $t2,11,normalizeLoopPW
 	
 	addi $t1,$t1,1
-	sb $t2,bufN($t1)
-	j normalizeLoop
-	endNormalizeLoop:				
+	sb $t2,bufNPW($t1)
+	j normalizeLoopPW
+	endNormalizeLoopPW:				
  	li $t0, 0 
  	li $t1, 0 
  	
- 	lw $t0,bufN($s1)
- 	addi $s1,$s1,1
+ 	lb $t0,bufNPW($t7)
+ 	addi $t7,$t7,1
  	#szukam instrukcji w drzewie
- 		# WAZNE!!! JESLI UDA SIE ZNALEZC OPERACJE TO W $s2 BEDZIE INFO ILE MA BYC PARAMETROW
- 		# A W $s3 BEDZIE ID OPERACJI KOLEJNO JAK W ZADANIU
- 	beq $t0,65,checkForA
- 	beq $t0,74,checkForJ
- 	beq $t0,77,checkForM
- 	beq $t0,78,checkForN
+ 		
+ 	beq $t0,65,checkForAPW
+ 	beq $t0,74,checkForJPW
+ 	beq $t0,77,checkForMPW
+ 	beq $t0,78,checkForNPW
  	
- 	#nieprawid³owe dane
- 	incD:
- 	jal clrBuffer
- 	jal clrWordBuffer
- 	li $v0,8
+ 	#nieprawid?owe dane
+ 	incDPW:
+ 	jal clrBufferPW
+ 	jal clrWordBufferPW
+ 	li $v0,4
  	la $a0,promptTryAgain
  	syscall
- 	j rootLoop
+ 	j rootLoopPW
  	
- 	checkedInstructionCorrect:
+ 	checkedInstructionCorrectPW:
+ 	addi $s0,$s0,1
+ 	#pierwszy odplozony
+ 	rootLoopDR:
+	li $t7,0 	#offset do sprawdzania normalizowanego buforu
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, promptPassIns
+  	syscall 
+  	
+  	li $v0, 1 	#4 odpowiada za wyswietlenie
+  	move $a0, $s0
+  	syscall	
+  	
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, newLine
+  	syscall 
+  	
+  	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
+  	la $a0, bufforDR
+  	li $t0,24	#podajemy max dlugosc
+  	move $a1, $t0
+  	syscall 
+  	
+  	li $t0, -1 
+  	li $t1,-1
+ 	normalizeLoopDR:
+ 	addi $t0,$t0,1
+ 	lb $t2,bufforDR($t0)
+ 	beqz $t2,endNormalizeLoopDR
+ 	beq $t2,10,endNormalizeLoopDR
+ 	beq $t2,32,normalizeLoopDR	#usuwamy spacje i tab
+	beq $t2,9,normalizeLoopDR		
+	beq $t2,11,normalizeLoopDR
+	
+	addi $t1,$t1,1
+	sb $t2,bufNDR($t1)
+	j normalizeLoopDR
+	endNormalizeLoopDR:				
+ 	li $t0, 0 
+ 	li $t1, 0 
  	
+ 	lb $t0,bufNDR($t7)
+ 	addi $t7,$t7,1
+ 	#szukam instrukcji w drzewie
+ 		
+ 	beq $t0,65,checkForADR
+ 	beq $t0,74,checkForJDR
+ 	beq $t0,77,checkForMDR
+ 	beq $t0,78,checkForNDR
+ 	#nieprawid?owe dane
+ 	incDDR:
+ 	jal clrBufferDR
+ 	jal clrWordBufferDR
+ 	li $v0,4
+ 	la $a0,promptTryAgain
+ 	syscall
+ 	j rootLoopDR
  	
+ 	checkedInstructionCorrectDR:
+ 	addi $s0,$s0,1
  	
+ 	rootLoopTRZ:
+	li $t7,0 	#offset do sprawdzania normalizowanego buforu
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, promptPassIns
+  	syscall 
+  	
+  	li $v0, 1 	#4 odpowiada za wyswietlenie
+  	move $a0, $s0
+  	syscall	
+  	
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, newLine
+  	syscall 
+  	
+  	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
+  	la $a0, bufforTRZ
+  	li $t0,24	#podajemy max dlugosc
+  	move $a1, $t0
+  	syscall 
+  	
+  	li $t0, -1 
+  	li $t1,-1
+ 	normalizeLoopTRZ:
+
  	
+ 	addi $t0,$t0,1
+ 	lb $t2,bufforTRZ($t0)
+ 	beqz $t2,endNormalizeLoopTRZ
+ 	beq $t2,10,endNormalizeLoopTRZ
+ 	beq $t2,32,normalizeLoopTRZ	#usuwamy spacje i tab
+	beq $t2,9,normalizeLoopTRZ		
+	beq $t2,11,normalizeLoopTRZ
+	
+	addi $t1,$t1,1
+	sb $t2,bufNTRZ($t1)
+	j normalizeLoopTRZ
+	endNormalizeLoopTRZ:				
+ 	li $t0, 0 
+ 	li $t1, 0 
+ 	
+ 	lb $t0,bufNTRZ($t7)
+ 	addi $t7,$t7,1
+ 	#szukam instrukcji w drzewie
+ 		
+ 	beq $t0,65,checkForATRZ
+ 	beq $t0,74,checkForJTRZ
+ 	beq $t0,77,checkForMTRZ
+ 	beq $t0,78,checkForNTRZ
+ 	
+ 	#nieprawid?owe dane
+ 	incDTRZ:
+ 	jal clrBufferTRZ
+ 	jal clrWordBufferTRZ
+ 	li $v0,4
+ 	la $a0,promptTryAgain
+ 	syscall
+ 	j rootLoopTRZ
+ 	
+ 	checkedInstructionCorrectTRZ:
+ 	addi $s0,$s0,1 	
+ 	
+ 	rootLoopCZT:
+	li $t7,0 	#offset do sprawdzania normalizowanego buforu
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, promptPassIns
+  	syscall 
+  	
+  	li $v0, 1 	#4 odpowiada za wyswietlenie
+  	move $a0, $s0
+  	syscall	
+  	
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, newLine
+  	syscall 
+  	
+  	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
+  	la $a0, bufforCZT
+  	li $t0,24	#podajemy max dlugosc
+  	move $a1, $t0
+  	syscall 
+  	
+  	li $t0, -1 
+  	li $t1,-1
+ 	normalizeLoopCZT:
+
+ 	
+ 	addi $t0,$t0,1
+ 	lb $t2,bufforCZT($t0)
+ 	beqz $t2,endNormalizeLoopCZT
+ 	beq $t2,10,endNormalizeLoopCZT
+ 	beq $t2,32,normalizeLoopCZT	#usuwamy spacje i tab
+	beq $t2,9,normalizeLoopCZT		
+	beq $t2,11,normalizeLoopCZT
+	
+	addi $t1,$t1,1
+	sb $t2,bufNCZT($t1)
+	j normalizeLoopCZT
+	endNormalizeLoopCZT:				
+ 	li $t0, 0 
+ 	li $t1, 0 
+ 	
+ 	lb $t0,bufNCZT($t7)
+ 	addi $t7,$t7,1
+ 	#szukam instrukcji w drzewie
+ 		
+ 	beq $t0,65,checkForACZT
+ 	beq $t0,74,checkForJCZT
+ 	beq $t0,77,checkForMCZT
+ 	beq $t0,78,checkForNCZT
+ 	
+ 	#nieprawid?owe dane
+ 	incDCZT:
+ 	jal clrBufferCZT
+ 	jal clrWordBufferCZT
+ 	li $v0,4
+ 	la $a0,promptTryAgain
+ 	syscall
+ 	j rootLoopCZT
+ 	
+ 	checkedInstructionCorrectCZT:
+ 	addi $s0,$s0,1
+ 	
+ 	rootLoopPT:
+	li $t7,0 	#offset do sprawdzania normalizowanego buforu
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, promptPassIns
+  	syscall 
+  	
+  	li $v0, 1 	#4 odpowiada za wyswietlenie
+  	move $a0, $s0
+  	syscall	
+  	
+  	li $v0, 4 	#4 odpowiada za wyswietlenie
+  	la $a0, newLine
+  	syscall 
+  	
+  	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
+  	la $a0, bufforPT
+  	li $t0,24	#podajemy max dlugosc
+  	move $a1, $t0
+  	syscall 
+  	
+  	li $t0, -1 
+  	li $t1,-1
+ 	normalizeLoopPT:
+ 	addi $t0,$t0,1
+ 	lb $t2,bufforPT($t0)
+ 	beqz $t2,endNormalizeLoopPT
+ 	beq $t2,10,endNormalizeLoopPT
+ 	beq $t2,32,normalizeLoopPT	#usuwamy spacje i tab
+	beq $t2,9,normalizeLoopPT		
+	beq $t2,11,normalizeLoopPT
+	
+	addi $t1,$t1,1
+	sb $t2,bufNPT($t1)
+	j normalizeLoopPT
+	endNormalizeLoopPT:				
+ 	li $t0, 0 
+ 	li $t1, 0 
+ 	
+ 	lb $t0,bufNPT($t7)
+ 	addi $t7,$t7,1
+ 	#szukam instrukcji w drzewie
+ 		
+ 	beq $t0,65,checkForAPT
+ 	beq $t0,74,checkForJPT
+ 	beq $t0,77,checkForMPT
+ 	beq $t0,78,checkForNPT
+ 	
+ 	#nieprawid?owe dane
+ 	incDPT:
+ 	jal clrBufferPT
+ 	jal clrWordBufferPT
+ 	li $v0,4
+ 	la $a0,promptTryAgain
+ 	syscall
+ 	j rootLoopPT
+ 	
+ 	checkedInstructionCorrectPT:
+ 	li $t1,0
+ 		printLoop:
+ 		addiu $sp,$sp,+4
+		lw $t0,0($sp)  #daje na stos instrukcje
+		la $a0,($t0)
+		li $v0,4
+		syscall
+		addi $t1,$t1,1
+		bne $t1,5,printLoop
  	
  	endProgram:
  		li $v0,10
  		syscall
 			
 	
-	checkForA:
-		sb $t0,bufWord($0)
+	checkForAPW:
+		sb $t0,bufWordPW($0)
 		
-		lb $t0,bufN($s1)
-		bne $t0,68,incD
-		sb $t0,bufWord($s1)	# jesli mamy oczekiwana literke to od razu ja wpisujemy
-		addi $s1,$s1,1		# kolejny indeks stringa
+		lb $t0,bufNPW($t7)
+		bne $t0,68,incDPW
+		sb $t0,bufWordPW($t7)	# jesli mamy oczekiwana literke to od razu ja wpisujemy
+		addi $t7,$t7,1		# kolejny indeks stringa
 		
-		lb $t0,bufN($s1)
-		bne $t0,68,incD
-		sb $t0,bufWord($s1)	# w tym miejscu doda sie drugie 'D' 
-		addi $s1,$s1,1
+		lb $t0,bufNPW($t7)
+		bne $t0,68,incDPW
+		sb $t0,bufWordPW($t7)	# w tym miejscu doda sie drugie 'D' 
+		addi $t7,$t7,1
 		
-		lb $t0,bufN($s1)
-		beq $t0,36,iTiSADD
-		beq $t0,73,iTiSADDI
+		lb $t0,bufNPW($t7)
+		beq $t0,36,iTiSADDPW
+		beq $t0,73,iTiSADDIPW
 		
-		j incD
-	iTiSADD:
+		j incDPW
+	iTiSADDPW:
 	# zapisz na stacku info o instrukcji
-	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj¹ ale kod mialby 500 linijek jakby wszystko obsluzyc
-		lb $t0,buffor($s1)
-		bne $t0,32,incD
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		lb $t0,bufforPW($t7)
+		bne $t0,32,incDPW
 		li $t0,10	#zaladowanie kodu newline do rej
-		sb $t0,bufWord($s1)
+		sb $t0,bufWordPW($t7)
 		li $t0,36
-		addi $s1,$s1,1
-		sb $t0,bufWord($s1)	#zapis znaczka $
+		addi $t7,$t7,1
+		sb $t0,bufWordPW($t7)	#zapis znaczka $
 		#zapisujemy ra chwilowo do innego rej
 		move $t4,$ra
 		#ladujemy kolejne arg
-		lb $t0,bufN($s1)
-		addi $s1,$s1,1	#s1 = 5
-		lb $t1,bufN($s1)
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNPW($t7)
 		#sprawdzamy kol arg
-		move $s3,$s1	#pomocniczy iterator buforowanej instrukcji
-		jal checkIfRegIndOK
-		sb $t0,bufWord($s3)
-		bne $t1,44,skipSecDig
-		addi $s3,$s3,1
-		addi $s1,$s1,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
-		sb $t1,bufWord($s1)
-		skipSecDig:
-		addi $s3,$s3,1
-		addi $s1,$s1,2
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+		jal checkIfRegIndOKPW
+		sb $t0,bufWordPW($t6)
+		beq $t1,44,skipSecDigPW	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPW($t6)
+		skipSecDigPW:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
 		li $t0,10	#zaladowanie kodu newline do rej
-		sb $t0,bufWord($s3)
+		sb $t0,bufWordPW($t6)
 		li $t0,36
-		addi $s3,$s3,1
-		sb $t0,bufWord($s3)	#zapis znaczka $
-		
+		addi $t6,$t6,1
+		sb $t0,bufWordPW($t6)	#zapis znaczka $
+		addi $t6,$t6,1
 		#drugi arg
 		#ladujemy kolejne arg
-		lb $t0,bufN($s1)
-		addi $s1,$s1,1
-		lb $t1,bufN($s1)
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPW($t7)
 		#sprawdzamy kol arg
-		jal checkIfRegIndOK
-		sb $t0,bufWord($s3)
-		bne $t1,44,skipSecDig1
-		addi $s3,$s3,1
-		addi $s1,$s1,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
-		sb $t1,bufWord($s1)
-		skipSecDig1:
-		addi $s3,$s3,1
-		addi $s1,$s1,2
+		jal checkIfRegIndOKPW
+		sb $t0,bufWordPW($t6)
+		beq $t1,44,skipSecDigPW1
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPW($t6)
+		skipSecDigPW1:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
 		li $t0,10	#zaladowanie kodu newline do rej
-		sb $t0,bufWord($s3)
+		sb $t0,bufWordPW($t6)
 		li $t0,36
-		addi $s3,$s3,1
-		sb $t0,bufWord($s3)	#zapis znaczka $
+		addi $t6,$t6,1
+		sb $t0,bufWordPW($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPW($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKPWLastArg
+		sb $t0,bufWordPW($t6)
+		beq $t1,0,skipSecDigPW2
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPW($t6)
+		skipSecDigPW2:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t6)
+		
+		
+		la $t0,bufWordPW  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectPW
+	iTiSADDIPW:
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		sb $t0,bufWordPW($t7)
+		addi $t7,$t7,1
+		lb $t0,bufforPW($t7)
+		bne $t0,32,incDPW
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t7)
+		li $t0,36
+		addi $t7,$t7,1
+
+		sb $t0,bufWordPW($t7)	#zapis znaczka $
+
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNPW($t7)
+		#sprawdzamy kol arg
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+
+		jal checkIfRegIndOKPW
+		sb $t0,bufWordPW($t6)
+		beq $t1,44,skipSecDigPWADDI	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPW($t6)
+		skipSecDigPWADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordPW($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPW($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKPW
+		sb $t0,bufWordPW($t6)
+		beq $t1,44,skipSecDigPW1ADDI
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPW($t6)
+		skipSecDigPW1ADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t6)
+		li $t0,36
 		
 		#ostatni arg
 		#ladujemy kolejne arg
-		lb $t0,bufN($s1)
-		addi $s1,$s1,1
-		lb $t1,bufN($s1)
+		loopCheckImmediatePW:
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1
+		blt $t0,48,checkIfEndPW
+		bgt $t0,57,checkIfEndPW
+		addi $t6,$t6,1
+		sb $t0,bufWordPW($t6)
+		j loopCheckImmediatePW
+		checkIfEndPW:
+		bne $t0,0,incDPW
 		#sprawdzamy kol arg
-		jal checkIfRegIndOKLastArg
-		sb $t0,bufWord($s3)
-		bne $t1,44,skipSecDig2
-		addi $s3,$s3,1
-		addi $s1,$s1,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
-		sb $t1,bufWord($s1)
-		skipSecDig2:
-		addi $s3,$s3,1
-		addi $s1,$s1,2
+		addi $t6,$t6,1
 		li $t0,10	#zaladowanie kodu newline do rej
-		sb $t0,bufWord($s3)
-		li $t0,36
-		addi $s3,$s3,1
-		sb $t0,bufWord($s3)	#zapis znaczka $
+		sb $t0,bufWordPW($t6)
 		
-		lw $t0,bufWord($0)  #daje na stos instrukcje
+		
+		la $t0,bufWordPW  #daje na stos instrukcje
 		sw $t0,0($sp)
-		addiu $sp,$sp,-1
+		addiu $sp,$sp,-4
 		
 		move $ra,$t4  
-		jr $ra
-	iTiSADDI:
-		jr $ra
-	checkForJ:
-		lb $t0,bufN($s1)
-		bne $t0,68,incD
-		addi $s1,$s1,1
-		j incD
-	checkForM:
-		j incD
-	checkForN:
-		j incD
+		j checkedInstructionCorrectPW
+	checkForJPW:
+		lb $t1,bufforPW($t7)
+		beq $t1,32,JPW
+		beq $t1,65,JALPW
+		beq $t1,82,JRPW
+		j incDPW
+	JPW:
+		sb $t0,bufWordPW($0)
+		lb $t0,bufforPW($t7)	#t7 = 1
+		bne $t0,32,incDPW
+		li $t2,10
+		sb $t2,bufWordPW($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringPWJ:
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndPWJ
+		bgt $t0,125,checkIfEndPWJ
+		addi $t6,$t6,1
+		sb $t0,bufWordPW($t6)
+		j loopCheckStringPWJ
+		checkIfEndPWJ:
+		bne $t0,0,incDPW
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t6)
 		
 		
-	clrBuffer:
-			# Wyczyœæ bufor
-    		la $t0, buffor     # Za³aduj adres bufora do $t0
-    		li $t1, 0            # Za³aduj wartoœæ zero do $t1
+		la $t0,bufWordPW  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectPW
+	JALPW:
+		sb $t0,bufWordPW($0)
+		sb $t1,bufWordPW($t7)
+		addi $t7,$t7,1
+		lb $t0,bufNPW($t7)	#t7 = 1
+		bne $t0,76,incDPW
+		sb $t0,bufWordPW($t7)
+		addi $t7,$t7,1
+	
+		li $t2,10
+		sb $t2,bufWordPW($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringPWJAL:
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndPWJAL
+		bgt $t0,125,checkIfEndPWJAL
+		addi $t6,$t6,1
+		sb $t0,bufWordPW($t6)
+		j loopCheckStringPWJAL
+		checkIfEndPWJAL:
+		bne $t0,0,incDPW
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t6)
+		
+		
+		la $t0,bufWordPW  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectPW
+	JRPW:
+		sb $t0,bufWordPW($0)
+		sb $t1,bufWordPW($t7)
+		addi $t7,$t7,1
+		
+		li $t2,10
+		sb $t2,bufWordPW($t7)	#dodajemy newline
+		move $t6,$t7
+		
+		loopCheckStringPWJR:
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndPWJR
+		bgt $t0,125,checkIfEndPWJR
+		addi $t6,$t6,1
+		sb $t0,bufWordPW($t6)
+		j loopCheckStringPWJR
+		checkIfEndPWJR:
+		bne $t0,0,incDPW
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t6)
+		
+		
+		la $t0,bufWordPW  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+
+		j checkedInstructionCorrectPW
+	checkForMPW:
+		sb $t0,bufWordPW($0)
+		
+		lb $t0,bufNPW($t7)
+		bne $t0,85,incDPW
+		sb $t0,bufWordPW($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPW($t7)
+		bne $t0,76,incDPW
+		sb $t0,bufWordPW($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPW($t7)
+		bne $t0,84,incDPW
+		sb $t0,bufWordPW($t7)
+		addi $t7,$t7,1
+		
+		
+		move $t6,$t7
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t6)
+		addi $t6,$t6,1
+		
+		#pierwszy arg
+		#ladujemy kolejne arg
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPW($t7)
+		#sprawdzamy arg
+		jal checkIfRegIndOKPW
+		sb $t0,bufWordPW($t6)
+		beq $t1,44,skipSecDigPW3
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPW($t6)
+		skipSecDigPW3:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordPW($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNPW($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPW($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKPWLastArg
+		sb $t0,bufWordPW($t6)
+		beq $t1,0,skipSecDigPW4
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPW($t6)
+		skipSecDigPW4:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPW($t6)
+	checkForNPW:
+		sb $t0,bufWordPW($0)
+		
+		lb $t0,bufNPW($t7)
+		bne $t0,79,incDPW
+		sb $t0,bufWordPW($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPW($t7)
+		bne $t0,79,incDPW
+		sb $t0,bufWordPW($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPW($t7)
+		bne $t0,80,incDPW
+		sb $t0,bufWordPW($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPW($t7)
+		bne $t0,0,incDPW
+		li $t0,10
+		sb $t0,bufWordPW($t7)
+		 
+		la $t0,bufWordPW  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+
+		j checkedInstructionCorrectPW
+		
+	clrBufferPW:
+			# Wyczy?? bufor
+    		la $t0, bufforPW     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
     
-    		li $t2, 0            # Zmienna pomocnicza (indeks pêtli)
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
     
-    		clear_loop:
-        		sb $t1, ($t0)    # Ustaw wartoœæ zero na adresie $t0
+    		clear_loopPW:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
         		addi $t0, $t0, 1 # Inkrementuj adres
-        		addi $t2, $t2, 1 # Inkrementuj indeks pêtli
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
-        		# SprawdŸ warunek zakoñczenia pêtli
-        		bne $t2, 50, clear_loop		
-		# Wyczyœæ buforNorm
-    		la $t0, bufN     # Za³aduj adres bufora do $t0
-    		li $t1, 0            # Za³aduj wartoœæ zero do $t1
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopPW		
+		# Wyczy?? buforNorm
+    		la $t0, bufNPW     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
     
-    		li $t2, 0            # Zmienna pomocnicza (indeks pêtli)
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
     
-    		clear_loop1:
-        		sb $t1, ($t0)    # Ustaw wartoœæ zero na adresie $t0
+    		clear_loopPW1:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
         		addi $t0, $t0, 1 # Inkrementuj adres
-        		addi $t2, $t2, 1 # Inkrementuj indeks pêtli
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
-        		# SprawdŸ warunek zakoñczenia pêtli
-        		bne $t2, 50, clear_loop1
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopPW1
 		jr $ra
-	clrWordBuffer:
-			# Wyczyœæ bufor s³owa
-    		la $t0, bufWord     # Za³aduj adres bufora do $t0
-    		li $t1, 0            # Za³aduj wartoœæ zero do $t1
+	clrWordBufferPW:
+			# Wyczy?? bufor s?owa
+    		la $t0, bufWordPW     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
     
-    		li $t2, 0            # Zmienna pomocnicza (indeks pêtli)
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
     
-    		clear_loop2:
-        		sb $t1, ($t0)    # Ustaw wartoœæ zero na adresie $t0
+    		clear_loopPW2:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
         		addi $t0, $t0, 1 # Inkrementuj adres
-        		addi $t2, $t2, 1 # Inkrementuj indeks pêtli
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
-        		# SprawdŸ warunek zakoñczenia pêtli
-        		bne $t2, 4, clear_loop2	
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 4, clear_loopPW2	
 		
 		jr $ra
-	checkIfRegIndOK:
+		checkIfRegIndOKPW:
 			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
-			bne $t1,44,twoDigitNum
-			blt $t0,48,incD
-			bgt $t0,57,incD
+			bne $t1,44,twoDigitNumPW1
+			blt $t0,48,incDPW
+			bgt $t0,57,incDPW
 			li $t3,1	#flaga ze 1 cyfra
 			jr $ra
-			twoDigitNum:
-			blt $t0,49,incD
-			bgt $t0,51,incD
+			twoDigitNumPW:
+			blt $t0,49,incDPW
+			bgt $t0,51,incDPW
 			
-			blt $t1,48,incD
-			beq $t0,3,checkForMax2
-			bgt $t1,57,incD
+			blt $t1,48,incDPW
+			beq $t0,3,checkForMPWax21
+			bgt $t1,57,incDPW
 			
 			li $t3,2	#flaga ze 2
 			jr $ra
-			checkForMax2:
-			bgt $t1,50,incD
+			checkForMPWax2:
+			bgt $t1,24,incDPW
 			
 			li $t3,2
-			jr $ra
+			jr $ra		
 			
-	checkIfRegIndOKLastArg:
+	
+	checkIfRegIndOKPWLastArg:
 			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
-			bne $t1,00,twoDigitNum1
-			blt $t0,48,incD
-			bgt $t0,57,incD
+			bne $t1,00,twoDigitNumPW1
+			blt $t0,48,incDPW
+			bgt $t0,57,incDPW
 			li $t3,1	#flaga ze 1 cyfra
 			jr $ra
-			twoDigitNum1:
-			blt $t0,49,incD
-			bgt $t0,51,incD
+			twoDigitNumPW1:
+			blt $t0,49,incDPW
+			bgt $t0,51,incDPW
 			
-			blt $t1,48,incD
-			beq $t0,3,checkForMax21
-			bgt $t1,57,incD
+			blt $t1,48,incDPW
+			beq $t0,3,checkForMPWax21
+			bgt $t1,57,incDPW
 			
 			li $t3,2	#flaga ze 2
 			jr $ra
-			checkForMax21:
-			bgt $t1,50,incD
+			checkForMPWax21:
+			bgt $t1,24,incDPW
+			
+			li $t3,2
+			jr $ra		
+			
+			checkForADR:
+		sb $t0,bufWordDR($0)
+		
+		lb $t0,bufNDR($t7)
+		bne $t0,68,incDDR
+		sb $t0,bufWordDR($t7)	# jesli mamy oczekiwana literke to od razu ja wpisujemy
+		addi $t7,$t7,1		# kolejny indeks stringa
+		
+		lb $t0,bufNDR($t7)
+		bne $t0,68,incDDR
+		sb $t0,bufWordDR($t7)	# w tym miejscu doda sie drugie 'D' 
+		addi $t7,$t7,1
+		
+		lb $t0,bufNDR($t7)
+		beq $t0,36,iTiSADDDR
+		beq $t0,73,iTiSADDIDR
+		
+		j incDDR
+	iTiSADDDR:
+	# zapisz na stacku info o instrukcji
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		lb $t0,bufforDR($t7)
+		bne $t0,32,incDDR
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t7)
+		li $t0,36
+		addi $t7,$t7,1
+		sb $t0,bufWordDR($t7)	#zapis znaczka $
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNDR($t7)
+		#sprawdzamy kol arg
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+		jal checkIfRegIndOKDR
+		sb $t0,bufWordDR($t6)
+		beq $t1,44,skipSecDigDR	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordDR($t6)
+		skipSecDigDR:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordDR($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNDR($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKDR
+		sb $t0,bufWordDR($t6)
+		beq $t1,44,skipSecDigDR1
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordDR($t6)
+		skipSecDigDR1:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordDR($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNDR($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKDRLastArg
+		sb $t0,bufWordDR($t6)
+		beq $t1,0,skipSecDigDR2
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordDR($t6)
+		skipSecDigDR2:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		
+		
+		la $t0,bufWordDR  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectDR
+	iTiSADDIDR:
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		sb $t0,bufWordDR($t7)
+		addi $t7,$t7,1
+		lb $t0,bufforDR($t7)
+		bne $t0,32,incDDR
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t7)
+		li $t0,36
+		addi $t7,$t7,1
+
+		sb $t0,bufWordDR($t7)	#zapis znaczka $
+
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNDR($t7)
+		#sprawdzamy kol arg
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+
+		jal checkIfRegIndOKDR
+		sb $t0,bufWordDR($t6)
+		beq $t1,44,skipSecDigDRADDI	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordDR($t6)
+		skipSecDigDRADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordDR($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNDR($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKDR
+		sb $t0,bufWordDR($t6)
+		beq $t1,44,skipSecDigDR1ADDI
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordDR($t6)
+		skipSecDigDR1ADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		li $t0,36
+		
+		#ostatni arg
+		#ladujemy kolejne arg
+		loopCheckImmediateDR:
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1
+		blt $t0,48,checkIfEndDR
+		bgt $t0,57,checkIfEndDR
+		addi $t6,$t6,1
+		sb $t0,bufWordDR($t6)
+		j loopCheckImmediateDR
+		checkIfEndDR:
+		bne $t0,0,incDDR
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		
+		
+		la $t0,bufWordDR  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectDR
+	checkForJDR:
+		lb $t1,bufforDR($t7)
+		beq $t1,32,JDR
+		beq $t1,65,JALDR
+		beq $t1,82,JRDR
+		j incDDR
+	JDR:
+		sb $t0,bufWordDR($0)
+		lb $t0,bufforDR($t7)	#t7 = 1
+		bne $t0,32,incDDR
+		li $t2,10
+		sb $t2,bufWordDR($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringDRJ:
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndDRJ
+		bgt $t0,125,checkIfEndDRJ
+		addi $t6,$t6,1
+		sb $t0,bufWordDR($t6)
+		j loopCheckStringDRJ
+		checkIfEndDRJ:
+		bne $t0,0,incDDR
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		
+		
+		la $t0,bufWordDR  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectDR
+	JALDR:
+		sb $t0,bufWordDR($0)
+		sb $t1,bufWordDR($t7)
+		addi $t7,$t7,1
+		lb $t0,bufNDR($t7)	#t7 = 1
+		bne $t0,76,incDDR
+		sb $t0,bufWordDR($t7)
+		addi $t7,$t7,1
+	
+		li $t2,10
+		sb $t2,bufWordDR($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringDRJAL:
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndDRJAL
+		bgt $t0,125,checkIfEndDRJAL
+		addi $t6,$t6,1
+		sb $t0,bufWordDR($t6)
+		j loopCheckStringDRJAL
+		checkIfEndDRJAL:
+		bne $t0,0,incDDR
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		
+		
+		la $t0,bufWordDR  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectDR
+	JRDR:
+		sb $t0,bufWordDR($0)
+		sb $t1,bufWordDR($t7)
+		addi $t7,$t7,1
+		
+		li $t2,10
+		sb $t2,bufWordDR($t7)	#dodajemy newline
+		move $t6,$t7
+		
+		loopCheckStringDRJR:
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndDRJR
+		bgt $t0,125,checkIfEndDRJR
+		addi $t6,$t6,1
+		sb $t0,bufWordDR($t6)
+		j loopCheckStringDRJR
+		checkIfEndDRJR:
+		bne $t0,0,incDDR
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		
+		
+		la $t0,bufWordDR  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectDR
+	checkForMDR:
+		sb $t0,bufWordDR($0)
+		
+		lb $t0,bufNDR($t7)
+		bne $t0,85,incDDR
+		sb $t0,bufWordDR($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNDR($t7)
+		bne $t0,76,incDDR
+		sb $t0,bufWordDR($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNDR($t7)
+		bne $t0,84,incDDR
+		sb $t0,bufWordDR($t7)
+		addi $t7,$t7,1
+		
+		
+		move $t6,$t7
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		addi $t6,$t6,1
+		
+		#pierwszy arg
+		#ladujemy kolejne arg
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNDR($t7)
+		#sprawdzamy arg
+		jal checkIfRegIndOKDR
+		sb $t0,bufWordDR($t6)
+		beq $t1,44,skipSecDigDR3
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordDR($t6)
+		skipSecDigDR3:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordDR($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNDR($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNDR($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKDRLastArg
+		sb $t0,bufWordDR($t6)
+		beq $t1,0,skipSecDigDR4
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordDR($t6)
+		skipSecDigDR4:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordDR($t6)
+	checkForNDR:
+		sb $t0,bufWordDR($0)
+		
+		lb $t0,bufNDR($t7)
+		bne $t0,79,incDDR
+		sb $t0,bufWordDR($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNDR($t7)
+		bne $t0,79,incDDR
+		sb $t0,bufWordDR($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNDR($t7)
+		bne $t0,80,incDDR
+		sb $t0,bufWordDR($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNDR($t7)
+		bne $t0,0,incDDR
+		li $t0,10
+		sb $t0,bufWordDR($t7)
+		 
+		la $t0,bufWordDR  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+
+		j checkedInstructionCorrectDR
+		
+		
+	clrBufferDR:
+			# Wyczy?? bufor
+    		la $t0, bufforDR     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopDR:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopDR		
+		# Wyczy?? buforNorm
+    		la $t0, bufNDR     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopDR1:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopDR1
+		jr $ra
+	clrWordBufferDR:
+			# Wyczy?? bufor s?owa
+    		la $t0, bufWordDR     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopDR2:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 4, clear_loopDR2	
+		
+		jr $ra
+		checkIfRegIndOKDR:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,44,twoDigitNumDR1
+			blt $t0,48,incDDR
+			bgt $t0,57,incDDR
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNumDR:
+			blt $t0,49,incDDR
+			bgt $t0,51,incDDR
+			
+			blt $t1,48,incDDR
+			beq $t0,3,checkForMDRax21
+			bgt $t1,57,incDDR
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMDRax2:
+			bgt $t1,24,incDDR
+			
+			li $t3,2
+			jr $ra		
+			
+	
+	checkIfRegIndOKDRLastArg:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,00,twoDigitNumDR1
+			blt $t0,48,incDDR
+			bgt $t0,57,incDDR
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNumDR1:
+			blt $t0,49,incDDR
+			bgt $t0,51,incDDR
+			
+			blt $t1,48,incDDR
+			beq $t0,3,checkForMDRax21
+			bgt $t1,57,incDDR
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMDRax21:
+			bgt $t1,24,incDDR
 			
 			li $t3,2
 			jr $ra		
 			
 			
+	checkForATRZ:
+		sb $t0,bufWordTRZ($0)
+		
+		lb $t0,bufNTRZ($t7)
+		bne $t0,68,incDTRZ
+		sb $t0,bufWordTRZ($t7)	# jesli mamy oczekiwana literke to od razu ja wpisujemy
+		addi $t7,$t7,1		# kolejny indeks stringa
+		
+		lb $t0,bufNTRZ($t7)
+		bne $t0,68,incDTRZ
+		sb $t0,bufWordTRZ($t7)	# w tym miejscu doda sie drugie 'D' 
+		addi $t7,$t7,1
+		
+		lb $t0,bufNTRZ($t7)
+		beq $t0,36,iTiSADDTRZ
+		beq $t0,73,iTiSADDITRZ
+		
+		j incDTRZ
+	iTiSADDTRZ:
+	# zapisz na stacku info o instrukcji
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		lb $t0,bufforTRZ($t7)
+		bne $t0,32,incDTRZ
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t7)
+		li $t0,36
+		addi $t7,$t7,1
+		sb $t0,bufWordTRZ($t7)	#zapis znaczka $
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNTRZ($t7)
+		#sprawdzamy kol arg
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+		jal checkIfRegIndOKTRZ
+		sb $t0,bufWordTRZ($t6)
+		beq $t1,44,skipSecDigTRZ	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordTRZ($t6)
+		skipSecDigTRZ:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordTRZ($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNTRZ($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKTRZ
+		sb $t0,bufWordTRZ($t6)
+		beq $t1,44,skipSecDigTRZ1
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordTRZ($t6)
+		skipSecDigTRZ1:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordTRZ($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNTRZ($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKTRZLastArg
+		sb $t0,bufWordTRZ($t6)
+		beq $t1,0,skipSecDigTRZ2
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordTRZ($t6)
+		skipSecDigTRZ2:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		
+		
+		la $t0,bufWordTRZ  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectTRZ
+	iTiSADDITRZ:
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		sb $t0,bufWordTRZ($t7)
+		addi $t7,$t7,1
+		lb $t0,bufforTRZ($t7)
+		bne $t0,32,incDTRZ
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t7)
+		li $t0,36
+		addi $t7,$t7,1
+
+		sb $t0,bufWordTRZ($t7)	#zapis znaczka $
+
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNTRZ($t7)
+		#sprawdzamy kol arg
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+
+		jal checkIfRegIndOKTRZ
+		sb $t0,bufWordTRZ($t6)
+		beq $t1,44,skipSecDigTRZADDI	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordTRZ($t6)
+		skipSecDigTRZADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordTRZ($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNTRZ($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKTRZ
+		sb $t0,bufWordTRZ($t6)
+		beq $t1,44,skipSecDigTRZ1ADDI
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordTRZ($t6)
+		skipSecDigTRZ1ADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		li $t0,36
+		
+		#ostatni arg
+		#ladujemy kolejne arg
+		loopCheckImmediateTRZ:
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1
+		blt $t0,48,checkIfEndTRZ
+		bgt $t0,57,checkIfEndTRZ
+		addi $t6,$t6,1
+		sb $t0,bufWordTRZ($t6)
+		j loopCheckImmediateTRZ
+		checkIfEndTRZ:
+		bne $t0,0,incDTRZ
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		
+		
+		la $t0,bufWordTRZ  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectTRZ
+	checkForJTRZ:
+		lb $t1,bufforTRZ($t7)
+		beq $t1,32,JTRZ
+		beq $t1,65,JALTRZ
+		beq $t1,82,JRTRZ
+		j incDTRZ
+	JTRZ:
+		sb $t0,bufWordTRZ($0)
+		lb $t0,bufforTRZ($t7)	#t7 = 1
+		bne $t0,32,incDTRZ
+		li $t2,10
+		sb $t2,bufWordTRZ($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringTRZJ:
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndTRZJ
+		bgt $t0,125,checkIfEndTRZJ
+		addi $t6,$t6,1
+		sb $t0,bufWordTRZ($t6)
+		j loopCheckStringTRZJ
+		checkIfEndTRZJ:
+		bne $t0,0,incDTRZ
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		
+		
+		la $t0,bufWordTRZ  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectTRZ
+	JALTRZ:
+		sb $t0,bufWordTRZ($0)
+		sb $t1,bufWordTRZ($t7)
+		addi $t7,$t7,1
+		lb $t0,bufNTRZ($t7)	#t7 = 1
+		bne $t0,76,incDTRZ
+		sb $t0,bufWordTRZ($t7)
+		addi $t7,$t7,1
+	
+		li $t2,10
+		sb $t2,bufWordTRZ($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringTRZJAL:
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndTRZJAL
+		bgt $t0,125,checkIfEndTRZJAL
+		addi $t6,$t6,1
+		sb $t0,bufWordTRZ($t6)
+		j loopCheckStringTRZJAL
+		checkIfEndTRZJAL:
+		bne $t0,0,incDTRZ
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		
+		
+		la $t0,bufWordTRZ  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectTRZ
+	JRTRZ:
+		sb $t0,bufWordTRZ($0)
+		sb $t1,bufWordTRZ($t7)
+		addi $t7,$t7,1
+		
+		li $t2,10
+		sb $t2,bufWordTRZ($t7)	#dodajemy newline
+		move $t6,$t7
+		
+		loopCheckStringTRZJR:
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndTRZJR
+		bgt $t0,125,checkIfEndTRZJR
+		addi $t6,$t6,1
+		sb $t0,bufWordTRZ($t6)
+		j loopCheckStringTRZJR
+		checkIfEndTRZJR:
+		bne $t0,0,incDTRZ
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		
+		
+		la $t0,bufWordTRZ  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectTRZ
+	checkForMTRZ:
+		sb $t0,bufWordTRZ($0)
+		
+		lb $t0,bufNTRZ($t7)
+		bne $t0,85,incDTRZ
+		sb $t0,bufWordTRZ($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNTRZ($t7)
+		bne $t0,76,incDTRZ
+		sb $t0,bufWordTRZ($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNTRZ($t7)
+		bne $t0,84,incDTRZ
+		sb $t0,bufWordTRZ($t7)
+		addi $t7,$t7,1
+		
+		
+		move $t6,$t7
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		addi $t6,$t6,1
+		
+		#pierwszy arg
+		#ladujemy kolejne arg
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNTRZ($t7)
+		#sprawdzamy arg
+		jal checkIfRegIndOKTRZ
+		sb $t0,bufWordTRZ($t6)
+		beq $t1,44,skipSecDigTRZ3
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordTRZ($t6)
+		skipSecDigTRZ3:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordTRZ($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNTRZ($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNTRZ($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKTRZLastArg
+		sb $t0,bufWordTRZ($t6)
+		beq $t1,0,skipSecDigTRZ4
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordTRZ($t6)
+		skipSecDigTRZ4:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordTRZ($t6)
+	checkForNTRZ:
+		sb $t0,bufWordTRZ($0)
+		
+		lb $t0,bufNTRZ($t7)
+		bne $t0,79,incDTRZ
+		sb $t0,bufWordTRZ($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNTRZ($t7)
+		bne $t0,79,incDTRZ
+		sb $t0,bufWordTRZ($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNTRZ($t7)
+		bne $t0,80,incDTRZ
+		sb $t0,bufWordTRZ($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNTRZ($t7)
+		bne $t0,0,incDTRZ
+		li $t0,10
+		sb $t0,bufWordTRZ($t7)
+		 
+		la $t0,bufWordTRZ  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+
+		j checkedInstructionCorrectTRZ
+		
+		
+	clrBufferTRZ:
+			# Wyczy?? bufor
+    		la $t0, bufforTRZ     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopTRZ:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopTRZ		
+		# Wyczy?? buforNorm
+    		la $t0, bufNTRZ     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopTRZ1:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopTRZ1
+		jr $ra
+	clrWordBufferTRZ:
+			# Wyczy?? bufor s?owa
+    		la $t0, bufWordTRZ     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopTRZ2:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 4, clear_loopTRZ2	
+		
+		jr $ra
+		checkIfRegIndOKTRZ:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,44,twoDigitNumTRZ1
+			blt $t0,48,incDTRZ
+			bgt $t0,57,incDTRZ
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNumTRZ:
+			blt $t0,49,incDTRZ
+			bgt $t0,51,incDTRZ
+			
+			blt $t1,48,incDTRZ
+			beq $t0,3,checkForMTRZax21
+			bgt $t1,57,incDTRZ
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMTRZax2:
+			bgt $t1,24,incDTRZ
+			
+			li $t3,2
+			jr $ra		
+			
+	
+	checkIfRegIndOKTRZLastArg:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,00,twoDigitNumTRZ1
+			blt $t0,48,incDTRZ
+			bgt $t0,57,incDTRZ
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNumTRZ1:
+			blt $t0,49,incDTRZ
+			bgt $t0,51,incDTRZ
+			
+			blt $t1,48,incDTRZ
+			beq $t0,3,checkForMTRZax21
+			bgt $t1,57,incDTRZ
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMTRZax21:
+			bgt $t1,24,incDTRZ
+			
+			li $t3,2
+			jr $ra		
+			
+			
+			checkForACZT:
+		sb $t0,bufWordCZT($0)
+		
+		lb $t0,bufNCZT($t7)
+		bne $t0,68,incDCZT
+		sb $t0,bufWordCZT($t7)	# jesli mamy oczekiwana literke to od razu ja wpisujemy
+		addi $t7,$t7,1		# kolejny indeks stringa
+		
+		lb $t0,bufNCZT($t7)
+		bne $t0,68,incDCZT
+		sb $t0,bufWordCZT($t7)	# w tym miejscu doda sie drugie 'D' 
+		addi $t7,$t7,1
+		
+		lb $t0,bufNCZT($t7)
+		beq $t0,36,iTiSADDCZT
+		beq $t0,73,iTiSADDICZT
+		
+		j incDCZT
+	iTiSADDCZT:
+	# zapisz na stacku info o instrukcji
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		lb $t0,bufforCZT($t7)
+		bne $t0,32,incDCZT
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t7)
+		li $t0,36
+		addi $t7,$t7,1
+		sb $t0,bufWordCZT($t7)	#zapis znaczka $
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNCZT($t7)
+		#sprawdzamy kol arg
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+		jal checkIfRegIndOKCZT
+		sb $t0,bufWordCZT($t6)
+		beq $t1,44,skipSecDigCZT	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordCZT($t6)
+		skipSecDigCZT:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordCZT($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNCZT($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKCZT
+		sb $t0,bufWordCZT($t6)
+		beq $t1,44,skipSecDigCZT1
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordCZT($t6)
+		skipSecDigCZT1:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordCZT($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNCZT($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKCZTLastArg
+		sb $t0,bufWordCZT($t6)
+		beq $t1,0,skipSecDigCZT2
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordCZT($t6)
+		skipSecDigCZT2:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		
+		
+		la $t0,bufWordCZT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectCZT
+	iTiSADDICZT:
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		sb $t0,bufWordCZT($t7)
+		addi $t7,$t7,1
+		lb $t0,bufforCZT($t7)
+		bne $t0,32,incDCZT
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t7)
+		li $t0,36
+		addi $t7,$t7,1
+
+		sb $t0,bufWordCZT($t7)	#zapis znaczka $
+
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNCZT($t7)
+		#sprawdzamy kol arg
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+
+		jal checkIfRegIndOKCZT
+		sb $t0,bufWordCZT($t6)
+		beq $t1,44,skipSecDigCZTADDI	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordCZT($t6)
+		skipSecDigCZTADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordCZT($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNCZT($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKCZT
+		sb $t0,bufWordCZT($t6)
+		beq $t1,44,skipSecDigCZT1ADDI
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordCZT($t6)
+		skipSecDigCZT1ADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		li $t0,36
+		
+		#ostatni arg
+		#ladujemy kolejne arg
+		loopCheckImmediateCZT:
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1
+		blt $t0,48,checkIfEndCZT
+		bgt $t0,57,checkIfEndCZT
+		addi $t6,$t6,1
+		sb $t0,bufWordCZT($t6)
+		j loopCheckImmediateCZT
+		checkIfEndCZT:
+		bne $t0,0,incDCZT
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		
+		
+		la $t0,bufWordCZT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectCZT
+	checkForJCZT:
+		lb $t1,bufforCZT($t7)
+		beq $t1,32,JCZT
+		beq $t1,65,JALCZT
+		beq $t1,82,JRCZT
+		j incDCZT
+	JCZT:
+		sb $t0,bufWordCZT($0)
+		lb $t0,bufforCZT($t7)	#t7 = 1
+		bne $t0,32,incDCZT
+		li $t2,10
+		sb $t2,bufWordCZT($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringCZTJ:
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndCZTJ
+		bgt $t0,125,checkIfEndCZTJ
+		addi $t6,$t6,1
+		sb $t0,bufWordCZT($t6)
+		j loopCheckStringCZTJ
+		checkIfEndCZTJ:
+		bne $t0,0,incDCZT
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		
+		
+		la $t0,bufWordCZT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectCZT
+	JALCZT:
+		sb $t0,bufWordCZT($0)
+		sb $t1,bufWordCZT($t7)
+		addi $t7,$t7,1
+		lb $t0,bufNCZT($t7)	#t7 = 1
+		bne $t0,76,incDCZT
+		sb $t0,bufWordCZT($t7)
+		addi $t7,$t7,1
+	
+		li $t2,10
+		sb $t2,bufWordCZT($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringCZTJAL:
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndCZTJAL
+		bgt $t0,125,checkIfEndCZTJAL
+		addi $t6,$t6,1
+		sb $t0,bufWordCZT($t6)
+		j loopCheckStringCZTJAL
+		checkIfEndCZTJAL:
+		bne $t0,0,incDCZT
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		
+		
+		la $t0,bufWordCZT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectCZT
+	JRCZT:
+		sb $t0,bufWordCZT($0)
+		sb $t1,bufWordCZT($t7)
+		addi $t7,$t7,1
+		
+		li $t2,10
+		sb $t2,bufWordCZT($t7)	#dodajemy newline
+		move $t6,$t7
+		
+		loopCheckStringCZTJR:
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndCZTJR
+		bgt $t0,125,checkIfEndCZTJR
+		addi $t6,$t6,1
+		sb $t0,bufWordCZT($t6)
+		j loopCheckStringCZTJR
+		checkIfEndCZTJR:
+		bne $t0,0,incDCZT
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		
+		
+		la $t0,bufWordCZT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectCZT
+	checkForMCZT:
+		sb $t0,bufWordCZT($0)
+		
+		lb $t0,bufNCZT($t7)
+		bne $t0,85,incDCZT
+		sb $t0,bufWordCZT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNCZT($t7)
+		bne $t0,76,incDCZT
+		sb $t0,bufWordCZT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNCZT($t7)
+		bne $t0,84,incDCZT
+		sb $t0,bufWordCZT($t7)
+		addi $t7,$t7,1
+		
+		
+		move $t6,$t7
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		addi $t6,$t6,1
+		
+		#pierwszy arg
+		#ladujemy kolejne arg
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNCZT($t7)
+		#sprawdzamy arg
+		jal checkIfRegIndOKCZT
+		sb $t0,bufWordCZT($t6)
+		beq $t1,44,skipSecDigCZT3
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordCZT($t6)
+		skipSecDigCZT3:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordCZT($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNCZT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNCZT($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKCZTLastArg
+		sb $t0,bufWordCZT($t6)
+		beq $t1,0,skipSecDigCZT4
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordCZT($t6)
+		skipSecDigCZT4:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordCZT($t6)
+	checkForNCZT:
+		sb $t0,bufWordCZT($0)
+		
+		lb $t0,bufNCZT($t7)
+		bne $t0,79,incDCZT
+		sb $t0,bufWordCZT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNCZT($t7)
+		bne $t0,79,incDCZT
+		sb $t0,bufWordCZT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNCZT($t7)
+		bne $t0,80,incDCZT
+		sb $t0,bufWordCZT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNCZT($t7)
+		bne $t0,0,incDCZT
+		li $t0,10
+		sb $t0,bufWordCZT($t7)
+		 
+		la $t0,bufWordCZT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+
+		j checkedInstructionCorrectCZT
+		
+		
+	clrBufferCZT:
+			# Wyczy?? bufor
+    		la $t0, bufforCZT     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopCZT:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopCZT		
+		# Wyczy?? buforNorm
+    		la $t0, bufNCZT     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopCZT1:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopCZT1
+		jr $ra
+	clrWordBufferCZT:
+			# Wyczy?? bufor s?owa
+    		la $t0, bufWordCZT     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopCZT2:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 4, clear_loopCZT2	
+		
+		jr $ra
+		checkIfRegIndOKCZT:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,44,twoDigitNumCZT1
+			blt $t0,48,incDCZT
+			bgt $t0,57,incDCZT
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNumCZT:
+			blt $t0,49,incDCZT
+			bgt $t0,51,incDCZT
+			
+			blt $t1,48,incDCZT
+			beq $t0,3,checkForMCZTax21
+			bgt $t1,57,incDCZT
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMCZTax2:
+			bgt $t1,24,incDCZT
+			
+			li $t3,2
+			jr $ra		
+			
+	
+	checkIfRegIndOKCZTLastArg:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,00,twoDigitNumCZT1
+			blt $t0,48,incDCZT
+			bgt $t0,57,incDCZT
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNumCZT1:
+			blt $t0,49,incDCZT
+			bgt $t0,51,incDCZT
+			
+			blt $t1,48,incDCZT
+			beq $t0,3,checkForMCZTax21
+			bgt $t1,57,incDCZT
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMCZTax21:
+			bgt $t1,24,incDCZT
+			
+			li $t3,2
+			jr $ra		
+			
+			
+	checkForAPT:
+		sb $t0,bufWordPT($0)
+		
+		lb $t0,bufNPT($t7)
+		bne $t0,68,incDPT
+		sb $t0,bufWordPT($t7)	# jesli mamy oczekiwana literke to od razu ja wpisujemy
+		addi $t7,$t7,1		# kolejny indeks stringa
+		
+		lb $t0,bufNPT($t7)
+		bne $t0,68,incDPT
+		sb $t0,bufWordPT($t7)	# w tym miejscu doda sie drugie 'D' 
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPT($t7)
+		beq $t0,36,iTiSADDPT
+		beq $t0,73,iTiSADDIPT
+		
+		j incDPT
+	iTiSADDPT:
+	# zapisz na stacku info o instrukcji
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		lb $t0,bufforPT($t7)
+		bne $t0,32,incDPT
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t7)
+		li $t0,36
+		addi $t7,$t7,1
+		sb $t0,bufWordPT($t7)	#zapis znaczka $
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNPT($t7)
+		#sprawdzamy kol arg
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+		jal checkIfRegIndOKPT
+		sb $t0,bufWordPT($t6)
+		beq $t1,44,skipSecDigPT	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPT($t6)
+		skipSecDigPT:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordPT($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPT($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKPT
+		sb $t0,bufWordPT($t6)
+		beq $t1,44,skipSecDigPT1
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPT($t6)
+		skipSecDigPT1:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordPT($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPT($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKPTLastArg
+		sb $t0,bufWordPT($t6)
+		beq $t1,0,skipSecDigPT2
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPT($t6)
+		skipSecDigPT2:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		
+		
+		la $t0,bufWordPT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectPT
+	iTiSADDIPT:
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+		sb $t0,bufWordPT($t7)
+		addi $t7,$t7,1
+		lb $t0,bufforPT($t7)
+		bne $t0,32,incDPT
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t7)
+		li $t0,36
+		addi $t7,$t7,1
+
+		sb $t0,bufWordPT($t7)	#zapis znaczka $
+
+		#zapisujemy ra chwilowo do innego rej
+		move $t4,$ra
+		#ladujemy kolejne arg
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1	#t7 = 5
+		lb $t1,bufNPT($t7)
+		#sprawdzamy kol arg
+		move $t6,$t7	#pomocniczy iterator buforowanej instrukcji
+
+		jal checkIfRegIndOKPT
+		sb $t0,bufWordPT($t6)
+		beq $t1,44,skipSecDigPTADDI	#jesli 2 cyfra to , to skip dodanie 2 cyfry
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPT($t6)
+		skipSecDigPTADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,2	#odpowiada za przesuniecie na pozycje odpowiednia w stringu ekstraktowanym
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordPT($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#drugi arg
+		#ladujemy kolejne arg
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPT($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKPT
+		sb $t0,bufWordPT($t6)
+		beq $t1,44,skipSecDigPT1ADDI
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPT($t6)
+		skipSecDigPT1ADDI:
+		addi $t6,$t6,1
+		addi $t7,$t7,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		li $t0,36
+		
+		#ostatni arg
+		#ladujemy kolejne arg
+		loopCheckImmediatePT:
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1
+		blt $t0,48,checkIfEndPT
+		bgt $t0,57,checkIfEndPT
+		addi $t6,$t6,1
+		sb $t0,bufWordPT($t6)
+		j loopCheckImmediatePT
+		checkIfEndPT:
+		bne $t0,0,incDPT
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		
+		
+		la $t0,bufWordPT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectPT
+	checkForJPT:
+		lb $t1,bufforPT($t7)
+		beq $t1,32,JPT
+		beq $t1,65,JALPT
+		beq $t1,82,JRPT
+		j incDPT
+	JPT:
+		sb $t0,bufWordPT($0)
+		lb $t0,bufforPT($t7)	#t7 = 1
+		bne $t0,32,incDPT
+		li $t2,10
+		sb $t2,bufWordPT($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringPTJ:
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndPTJ
+		bgt $t0,125,checkIfEndPTJ
+		addi $t6,$t6,1
+		sb $t0,bufWordPT($t6)
+		j loopCheckStringPTJ
+		checkIfEndPTJ:
+		bne $t0,0,incDPT
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		
+		
+		la $t0,bufWordPT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectPT
+	JALPT:
+		sb $t0,bufWordPT($0)
+		sb $t1,bufWordPT($t7)
+		addi $t7,$t7,1
+		lb $t0,bufNPT($t7)	#t7 = 1
+		bne $t0,76,incDPT
+		sb $t0,bufWordPT($t7)
+		addi $t7,$t7,1
+	
+		li $t2,10
+		sb $t2,bufWordPT($t7)	#dodajemy newline
+		move $t6,$t7
+
+		loopCheckStringPTJAL:
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndPTJAL
+		bgt $t0,125,checkIfEndPTJAL
+		addi $t6,$t6,1
+		sb $t0,bufWordPT($t6)
+		j loopCheckStringPTJAL
+		checkIfEndPTJAL:
+		bne $t0,0,incDPT
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		
+		
+		la $t0,bufWordPT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectPT
+	JRPT:
+		sb $t0,bufWordPT($0)
+		sb $t1,bufWordPT($t7)
+		addi $t7,$t7,1
+		
+		li $t2,10
+		sb $t2,bufWordPT($t7)	#dodajemy newline
+		move $t6,$t7
+		
+		loopCheckStringPTJR:
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1
+		blt $t0,33,checkIfEndPTJR
+		bgt $t0,125,checkIfEndPTJR
+		addi $t6,$t6,1
+		sb $t0,bufWordPT($t6)
+		j loopCheckStringPTJR
+		checkIfEndPTJR:
+		bne $t0,0,incDPT
+		#sprawdzamy kol arg
+		addi $t6,$t6,1
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		
+		
+		la $t0,bufWordPT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+		move $ra,$t4  
+		j checkedInstructionCorrectPT
+	checkForMPT:
+		sb $t0,bufWordPT($0)
+		
+		lb $t0,bufNPT($t7)
+		bne $t0,85,incDPT
+		sb $t0,bufWordPT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPT($t7)
+		bne $t0,76,incDPT
+		sb $t0,bufWordPT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPT($t7)
+		bne $t0,84,incDPT
+		sb $t0,bufWordPT($t7)
+		addi $t7,$t7,1
+		
+		
+		move $t6,$t7
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		addi $t6,$t6,1
+		
+		#pierwszy arg
+		#ladujemy kolejne arg
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPT($t7)
+		#sprawdzamy arg
+		jal checkIfRegIndOKPT
+		sb $t0,bufWordPT($t6)
+		beq $t1,44,skipSecDigPT3
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPT($t6)
+		skipSecDigPT3:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+		li $t0,36
+		addi $t6,$t6,1
+		sb $t0,bufWordPT($t6)	#zapis znaczka $
+		addi $t6,$t6,1
+		#ostatni arg
+		#ladujemy kolejne arg
+		lb $t0,bufNPT($t7)
+		addi $t7,$t7,1
+		lb $t1,bufNPT($t7)
+		#sprawdzamy kol arg
+		jal checkIfRegIndOKPTLastArg
+		sb $t0,bufWordPT($t6)
+		beq $t1,0,skipSecDigPT4
+		addi $t6,$t6,1
+		addi $t7,$t7,1	#jesli byly 2 cyfry to dodatkowo trzeba przes o 1
+		sb $t1,bufWordPT($t6)
+		skipSecDigPT4:
+		addi $t6,$t6,1
+		addi $t7,$t7,2
+		li $t0,10	#zaladowanie kodu newline do rej
+		sb $t0,bufWordPT($t6)
+	checkForNPT:
+		sb $t0,bufWordPT($0)
+		
+		lb $t0,bufNPT($t7)
+		bne $t0,79,incDPT
+		sb $t0,bufWordPT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPT($t7)
+		bne $t0,79,incDPT
+		sb $t0,bufWordPT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPT($t7)
+		bne $t0,80,incDPT
+		sb $t0,bufWordPT($t7)
+		addi $t7,$t7,1
+		
+		lb $t0,bufNPT($t7)
+		bne $t0,0,incDPT
+		li $t0,10
+		sb $t0,bufWordPT($t7)
+		 
+		la $t0,bufWordPT  #daje na stos instrukcje
+		sw $t0,0($sp)
+		addiu $sp,$sp,-4
+		
+
+		j checkedInstructionCorrectPT
+		
+		
+	clrBufferPT:
+			# Wyczy?? bufor
+    		la $t0, bufforPT     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopPT:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopPT		
+		# Wyczy?? buforNorm
+    		la $t0, bufNPT     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopPT1:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 24, clear_loopPT1
+		jr $ra
+	clrWordBufferPT:
+			# Wyczy?? bufor s?owa
+    		la $t0, bufWordPT     # Za?aduj adres bufora do $t0
+    		li $t1, 0            # Za?aduj warto?? zero do $t1
+    
+    		li $t2, 0            # Zmienna pomocnicza (indeks p?tli)
+    
+    		clear_loopPT2:
+        		sb $t1, ($t0)    # Ustaw warto?? zero na adresie $t0
+        		addi $t0, $t0, 1 # Inkrementuj adres
+        		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
+        
+        		# Sprawd? warunek zako?czenia p?tli
+        		bne $t2, 4, clear_loopPT2	
+		
+		jr $ra
+		checkIfRegIndOKPT:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,44,twoDigitNumPT1
+			blt $t0,48,incDPT
+			bgt $t0,57,incDPT
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNumPT:
+			blt $t0,49,incDPT
+			bgt $t0,51,incDPT
+			
+			blt $t1,48,incDPT
+			beq $t0,3,checkForMPTax21
+			bgt $t1,57,incDPT
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMPTax2:
+			bgt $t1,24,incDPT
+			
+			li $t3,2
+			jr $ra		
+			
+	
+	checkIfRegIndOKPTLastArg:
+			#sprawdz zakresy literek	#t0 to 1 litera po $ a t1 to 2
+			bne $t1,00,twoDigitNumPT1
+			blt $t0,48,incDPT
+			bgt $t0,57,incDPT
+			li $t3,1	#flaga ze 1 cyfra
+			jr $ra
+			twoDigitNumPT1:
+			blt $t0,49,incDPT
+			bgt $t0,51,incDPT
+			
+			blt $t1,48,incDPT
+			beq $t0,3,checkForMPTax21
+			bgt $t1,57,incDPT
+			
+			li $t3,2	#flaga ze 2
+			jr $ra
+			checkForMPTax21:
+			bgt $t1,24,incDPT
+			
+			li $t3,2
+			jr $ra		
+			
+			
+
+
