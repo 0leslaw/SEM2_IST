@@ -1,0 +1,361 @@
+.data 
+	msgProceed: .asciiz "\n\nKontynuowac?  	\n0-nie\n1-tak\n"
+	msgChoseSign: .asciiz "\nPodaj znaczek: x lub o\n"
+	msgInputNum: .asciiz "\nPodaj liczbe w której miejscu chcesz wstawic znaczek\n"
+	msgEquals: .asciiz "\nWynik: "
+	msgErr: .asciiz "\nError! zla liczba TRY AGAIN"
+	msgErr1: .asciiz "\nError! zly znaczek "
+	msgPLAYERWINS: .asciiz "\nWygrales! :D\n"
+	msgAIWINS: .asciiz "\nPrzegrales! :,(\n"
+	msgDRAW: .asciiz "\nRemis! :)\n"
+	msgScore: .asciiz "\nwyniki (TY vs PC): "
+	space: .asciiz " "  # Spacja
+	board: .space 16
+.text
+	#remisuje sekwencja: 23498
+	gameStart:
+	li $v0,4
+	la $a0,msgChoseSign
+	syscall
+	
+	li $v0, 12
+    	syscall
+	andi $s0, $v0, 0xFF
+	
+	beq $s0,111,signCorrect
+	li $s1,111	#zapis info o znaku komputera
+	beq $s0,120,signCorrect1
+	
+	li $v0,4
+	la $a0,msgErr1
+	syscall
+	
+	j gameStart
+	
+	signCorrect:
+	li $s1,120	#zapis info o znaku komputera
+	signCorrect1:
+	resetBoard:
+		li $t0,49	#liczba dla komorki 49 = 1 w ascii
+		li $t1,0	#pozycja w stringu
+		li $t2,0	#iter wewnetrzny
+		li $t3,0	#iter zewnetrzny
+		resLoop:
+			sb $t0,board($t1)
+			addi $t0,$t0,1
+			addi $t1,$t1,1
+			addi $t2,$t2,1
+			bne $t2,3,resLoop
+			li $t2,10
+			sb $t2,board($t1)
+			addi $t1,$t1,1
+			li $t2,0	#reset wew iter
+			addi $t3,$t3,1
+			bne $t3,3,resLoop
+	gameLoop:
+		beq $s2,2,checkDraw
+		beq $s3,2,endAIWINS
+		j roundLoop
+		checkDraw:
+		beq $s3,2,endDRAW
+		j endPLAYERWINS
+	roundLoop:
+		li $v0,4
+		la $a0,msgInputNum
+		syscall
+		li $v0,4
+		la $a0,board
+		syscall
+		takeIn:
+		li $v0,5	#pobranie pozycji w macierzy od usera
+		syscall
+		move $t0,$v0
+		bgt $t0,9,wrongNumErr
+		blt $t0,1,wrongNumErr
+		
+		#przer liczbe na ind macierzy
+		blt $t0,4,skipAdd
+		addi $t0,$t0,1
+		blt $t0,8,skipAdd	#od 8 bo powiekszylismy $t0 o 1
+		addi $t0,$t0,1
+		
+		skipAdd:
+		addi $t0,$t0,-1 	# przesuwamy bo indeksujemy od 0
+		#sprawdzamy czy zajete
+		
+		lb $t1,board($t0)
+		beq $t1,111,wrongNumErr
+		beq $t1,120,wrongNumErr
+		
+		sb $s0,board($t0)
+		checkPlayerWin:
+		li $t0,5	#srodek
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckMid
+		li $t0,0	#lewyg
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckLRD
+		li $t0,10	#prawyd
+		lb $t1,board($t0)
+		beq $t1,$s0,playerWins
+		skipCheckLRD:
+		li $t0,2	#prawyg
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckRLD
+		li $t0,8	#lewyd
+		lb $t1,board($t0)
+		beq $t1,$s0,playerWins
+		skipCheckRLD: 
+		li $t0,4	#wiersz2
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckSecRow
+		li $t0,6	#wiersz2
+		lb $t1,board($t0)
+		beq $t1,$s0,playerWins 
+		skipCheckSecRow:
+		li $t0,1	#kol2
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckMid
+		li $t0,9	#kol2
+		lb $t1,board($t0)
+		beq $t1,$s0,playerWins
+	 
+		skipCheckMid:
+		li $t0,0	
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckUpLeftIntersection
+		li $t0,1	#wiersz1
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckRow1
+		li $t0,2	#wiersz1
+		lb $t1,board($t0)
+		beq $t1,$s0,playerWins
+		skipCheckRow1:
+		li $t0,4	#kol1
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckUpLeftIntersection
+		li $t0,8	#kol1
+		lb $t1,board($t0)
+		beq $t1,$s0,playerWins
+		
+		skipCheckUpLeftIntersection:
+		li $t0,10	
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckRDIntersection
+		li $t0,9	#wiersz3
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckRow3
+		li $t0,8	#wiersz3
+		lb $t1,board($t0)
+		beq $t1,$s0,playerWins
+		skipCheckRow3:
+		li $t0,6	#kol3
+		lb $t1,board($t0)
+		bne $t1,$s0,skipCheckRDIntersection
+		li $t0,2	#kol3
+		lb $t1,board($t0)
+		beq $t1,$s0,playerWins
+		skipCheckRDIntersection:
+		#nie wygra³ player
+		AIstrategy:
+		#preferencja przek¹tnych
+		li $t0,5	
+		lb $t1,board($t0)
+		beq $t1,$s1,AINOTChose1
+		bne $t1,$s0,AIChose
+		AINOTChose1:
+		li $t0,0	
+		lb $t1,board($t0)
+		beq $t1,$s1,AINOTChose2
+		bne $t1,$s0,AIChose
+		AINOTChose2:
+		li $t0,2	
+		lb $t1,board($t0)
+		beq $t1,$s1,AINOTChose3
+		bne $t1,$s0,AIChose
+		AINOTChose3:
+		li $t0,8	
+		lb $t1,board($t0)
+		beq $t1,$s1,AINOTChose4
+		bne $t1,$s0,AIChose
+		AINOTChose4:
+		li $t0,10	
+		lb $t1,board($t0)
+		beq $t1,$s1,AINOTChose5
+		bne $t1,$s0,AIChose
+		AINOTChose5:
+		#nie udalo sie znalezc na przekatnej
+		li $t0,1	
+		lb $t1,board($t0)
+		beq $t1,$s1,AINOTChose6
+		bne $t1,$s0,AIChose
+		AINOTChose6:
+		li $t0,4	
+		lb $t1,board($t0)
+		beq $t1,$s1,AINOTChose7
+		bne $t1,$s0,AIChose
+		AINOTChose7:
+		li $t0,6	
+		lb $t1,board($t0)
+		beq $t1,$s1,AINOTChose8
+		bne $t1,$s0,AIChose
+		AINOTChose8:
+		li $t0,9	
+		lb $t1,board($t0)
+		beq $t1,$s1,AINOTChose9
+		bne $t1,$s0,AIChose
+		AINOTChose9:
+		j draw	#bo zawsze jesli po wybraniu przez usera nie wygrywa i AI nic nie wybierze to jest remis
+	
+		AIChose:
+		sb $s1,board($t0)
+		checkAiWon:
+		li $t0,5	#srodek
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckMid
+		li $t0,0	#lewyg
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckLRD
+		li $t0,10	#prawyd
+		lb $t1,board($t0)
+		beq $t1,$s1,AIWins
+		AIskipCheckLRD:
+		li $t0,2	#prawyg
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckRLD
+		li $t0,8	#lewyd
+		lb $t1,board($t0)
+		beq $t1,$s1,AIWins
+		AIskipCheckRLD: 
+		li $t0,4	#wiersz2
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckSecRow
+		li $t0,6	#wiersz2
+		lb $t1,board($t0)
+		beq $t1,$s1,AIWins 
+		AIskipCheckSecRow:
+		li $t0,1	#kol2
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckMid
+		li $t0,9	#kol2
+		lb $t1,board($t0)
+		beq $t1,$s1,AIWins
+	 
+		AIskipCheckMid:
+		li $t0,0	
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckUpLeftIntersection
+		li $t0,1	#wiersz1
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckRow1
+		li $t0,2	#wiersz1
+		lb $t1,board($t0)
+		beq $t1,$s1,AIWins
+		AIskipCheckRow1:
+		li $t0,4	#kol1
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckUpLeftIntersection
+		li $t0,8	#kol1
+		lb $t1,board($t0)
+		beq $t1,$s1,AIWins
+		
+		AIskipCheckUpLeftIntersection:
+		li $t0,10	
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckRDIntersection
+		li $t0,9	#wiersz3
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckRow3
+		li $t0,8	#wiersz3
+		lb $t1,board($t0)
+		beq $t1,$s1,AIWins
+		AIskipCheckRow3:
+		li $t0,6	#kol3
+		lb $t1,board($t0)
+		bne $t1,$s1,AIskipCheckRDIntersection
+		li $t0,2	#kol3
+		lb $t1,board($t0)
+		beq $t1,$s1,AIWins
+		AIskipCheckRDIntersection:
+		#nie wygra³ AI
+		j roundLoop
+	playerWins:
+		addi $s2,$s2,1
+		li $v0,4
+		la $a0,msgScore
+		syscall
+		
+		li $v0,1
+		move $a0,$s2
+		syscall
+		
+		li $v0,4
+		la $a0,space
+		syscall
+		
+		li $v0,1
+		move $a0,$s3
+		syscall
+		j resetBoard
+	AIWins:
+		addi $s3,$s3,1
+		li $v0,4
+		la $a0,msgScore
+		syscall
+		
+		li $v0,1
+		move $a0,$s2
+		syscall
+		
+		li $v0,4
+		la $a0,space
+		syscall
+		
+		li $v0,1
+		move $a0,$s3
+		syscall
+		j resetBoard
+	draw:
+		addi $s2,$s2,1
+		addi $s3,$s3,1
+		li $v0,4
+		la $a0,msgScore
+		syscall
+		
+		li $v0,1
+		move $a0,$s2
+		syscall
+		
+		li $v0,4
+		la $a0,space
+		syscall
+		
+		li $v0,1
+		move $a0,$s3
+		syscall
+		j resetBoard
+	wrongNumErr:
+		li $v0,4
+		la $a0,msgErr
+		syscall
+		j takeIn
+	endPLAYERWINS:
+		li $v0,4
+		la $a0,msgPLAYERWINS
+		syscall
+		li $v0,10
+		syscall
+		
+	endAIWINS:
+		li $v0,4
+		la $a0,msgAIWINS
+		syscall
+		li $v0,10
+		syscall
+		
+	endDRAW:
+		li $v0,4
+		la $a0,msgDRAW
+		syscall
+		li $v0,10
+		syscall

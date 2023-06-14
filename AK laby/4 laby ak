@@ -1,0 +1,101 @@
+.data 
+	messageProceed: .asciiz "\n\nKontynuowac?  	\n0-nie\n1-tak\n"
+	messageChoose: .asciiz "\nPodaj kod dzialania: \n0-dodawanie,\n1-odejmowanie,\n2-mno¿enie,\n3-dzielenie\n"
+	messageFirstNum: .asciiz "\nPodaj 1 liczbe\n"
+	messageSecondNum: .asciiz "\nPodaj 2 liczbe\n"
+	messageEquals: .asciiz "\nWynik: "
+	messageErr: .asciiz "\nError! z³a liczba "
+
+.text
+	main:
+		#petla
+		jal checkForQuit
+		jal AskForOperation
+		jal AskAndLoadFirst
+		jal AskAndLoadSecond
+		jal calculate
+		jal printResult
+		j main
+		
+	terminate:
+		li $v0, 10
+		syscall
+	error:
+		li $v0,4
+		la $a0,messageErr
+		syscall	
+		
+		j main
+	checkForQuit:
+		li $v0,4
+		la $a0,messageProceed
+		syscall
+		
+		li $v0,5       #zaladowanie double
+		syscall
+		move $t0,$v0
+		
+		bne $t0,1,terminate
+		jr $ra
+	AskForOperation:
+		li $v0,4
+		la $a0,messageChoose
+		syscall
+		
+		li $v0,5       #zaladowanie int
+		syscall
+		move $t0,$v0
+		
+		bgt $t0,3,err
+		blt $t0,0,err
+		jr $ra
+		err:	
+		j error	
+	AskAndLoadFirst:
+		li $v0,4
+		la $a0,messageFirstNum
+		syscall
+		
+		li $v0,7       #zaladowanie double
+		syscall
+		add.d $f2,$f0,$f12
+		
+		jr $ra
+	AskAndLoadSecond:
+		li $v0,4
+		la $a0,messageSecondNum
+		syscall
+		
+		li $v0,7       #zaladowanie double
+		syscall
+		
+		
+		jr $ra
+	calculate:
+		bne $t0,0,notAdd
+		add.d $f4,$f2,$f0
+		jr $ra
+		notAdd:
+		bne $t0,1,notSub
+		sub.d $f4,$f2,$f0
+		jr $ra
+		notSub:
+		bne $t0,2,notMul
+		mul.d $f4,$f2,$f0
+		jr $ra
+		notMul:
+		div.d $f4,$f2,$f0
+		jr $ra
+	printResult:
+		li $v0,4
+		la $a0,messageEquals
+		syscall
+	
+		li $v0,3
+		add.d $f12,$f4,$f10
+		syscall
+		
+		jr $ra
+
+		
+		
