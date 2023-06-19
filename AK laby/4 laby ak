@@ -69,7 +69,10 @@
 		li $v0,7       #zaladowanie double
 		syscall
 		
-		
+		bne $t0,3,skipZero
+		c.eq.d $f0,$f10
+		bc1t err		
+		skipZero:
 		jr $ra
 	calculate:
 		bne $t0,0,notAdd
