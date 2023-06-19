@@ -1,20 +1,20 @@
- .data
+.data
 
-bufforPW: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufNPW: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufWordPW: .space 24
-bufforDR: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufNDR: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufWordDR: .space 24
-bufforTRZ: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufNTRZ: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufWordTRZ: .space 24
-bufforCZT: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufNCZT: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufWordCZT: .space 24
-bufforPT: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufNPT: .space 24   # Tablica na przechowanie kolejnych word?w na stos
-bufWordPT: .space 24
+bufforPW: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufNPW: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufWordPW: .space 50
+bufforDR: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufNDR: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufWordDR: .space 50
+bufforTRZ: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufNTRZ: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufWordTRZ: .space 50
+bufforCZT: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufNCZT: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufWordCZT: .space 50
+bufforPT: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufNPT: .space 50   # Tablica na przechowanie kolejnych word?w na stos
+bufWordPT: .space 50
 promptPassIns: .asciiz "Podaj instrukcje nr "
 newLine: .asciiz "\n"
 promptTryAgain: .asciiz "Nieprawid?owa instrukcja, try again\n"
@@ -36,7 +36,7 @@ rootLoopPW:
   	
   	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
   	la $a0, bufforPW
-  	li $t0,24	#podajemy max dlugosc
+  	li $t0,50	#podajemy max dlugosc
   	move $a1, $t0
   	syscall 
   	
@@ -95,7 +95,7 @@ rootLoopPW:
   	
   	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
   	la $a0, bufforDR
-  	li $t0,24	#podajemy max dlugosc
+  	li $t0,50	#podajemy max dlugosc
   	move $a1, $t0
   	syscall 
   	
@@ -153,7 +153,7 @@ rootLoopPW:
   	
   	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
   	la $a0, bufforTRZ
-  	li $t0,24	#podajemy max dlugosc
+  	li $t0,50	#podajemy max dlugosc
   	move $a1, $t0
   	syscall 
   	
@@ -214,7 +214,7 @@ rootLoopPW:
   	
   	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
   	la $a0, bufforCZT
-  	li $t0,24	#podajemy max dlugosc
+  	li $t0,50	#podajemy max dlugosc
   	move $a1, $t0
   	syscall 
   	
@@ -275,7 +275,7 @@ rootLoopPW:
   	
   	li $v0,8	#m?wi syscallowi zeby przeprowadzic pobranie tekstu od usera
   	la $a0, bufforPT
-  	li $t0,24	#podajemy max dlugosc
+  	li $t0,50	#podajemy max dlugosc
   	move $a1, $t0
   	syscall 
   	
@@ -351,7 +351,7 @@ rootLoopPW:
 		j incDPW
 	iTiSADDPW:
 	# zapisz na stacku info o instrukcji
-	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		lb $t0,bufforPW($t7)
 		bne $t0,32,incDPW
 		li $t0,10	#zaladowanie kodu newline do rej
@@ -429,7 +429,7 @@ rootLoopPW:
 		move $ra,$t4  
 		j checkedInstructionCorrectPW
 	iTiSADDIPW:
-#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		sb $t0,bufWordPW($t7)
 		addi $t7,$t7,1
 		lb $t0,bufforPW($t7)
@@ -715,7 +715,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopPW		
+        		bne $t2, 50, clear_loopPW		
 		# Wyczy?? buforNorm
     		la $t0, bufNPW     # Za?aduj adres bufora do $t0
     		li $t1, 0            # Za?aduj warto?? zero do $t1
@@ -728,7 +728,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopPW1
+        		bne $t2, 50, clear_loopPW1
 		jr $ra
 	clrWordBufferPW:
 			# Wyczy?? bufor s?owa
@@ -764,7 +764,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMPWax2:
-			bgt $t1,24,incDPW
+			bgt $t1,50,incDPW
 			
 			li $t3,2
 			jr $ra		
@@ -788,7 +788,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMPWax21:
-			bgt $t1,24,incDPW
+			bgt $t1,50,incDPW
 			
 			li $t3,2
 			jr $ra		
@@ -813,7 +813,7 @@ rootLoopPW:
 		j incDDR
 	iTiSADDDR:
 	# zapisz na stacku info o instrukcji
-	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		lb $t0,bufforDR($t7)
 		bne $t0,32,incDDR
 		li $t0,10	#zaladowanie kodu newline do rej
@@ -891,7 +891,7 @@ rootLoopPW:
 		move $ra,$t4  
 		j checkedInstructionCorrectDR
 	iTiSADDIDR:
-#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		sb $t0,bufWordDR($t7)
 		addi $t7,$t7,1
 		lb $t0,bufforDR($t7)
@@ -1178,7 +1178,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopDR		
+        		bne $t2, 50, clear_loopDR		
 		# Wyczy?? buforNorm
     		la $t0, bufNDR     # Za?aduj adres bufora do $t0
     		li $t1, 0            # Za?aduj warto?? zero do $t1
@@ -1191,7 +1191,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopDR1
+        		bne $t2, 50, clear_loopDR1
 		jr $ra
 	clrWordBufferDR:
 			# Wyczy?? bufor s?owa
@@ -1227,7 +1227,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMDRax2:
-			bgt $t1,24,incDDR
+			bgt $t1,50,incDDR
 			
 			li $t3,2
 			jr $ra		
@@ -1251,7 +1251,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMDRax21:
-			bgt $t1,24,incDDR
+			bgt $t1,50,incDDR
 			
 			li $t3,2
 			jr $ra		
@@ -1277,7 +1277,7 @@ rootLoopPW:
 		j incDTRZ
 	iTiSADDTRZ:
 	# zapisz na stacku info o instrukcji
-	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		lb $t0,bufforTRZ($t7)
 		bne $t0,32,incDTRZ
 		li $t0,10	#zaladowanie kodu newline do rej
@@ -1355,7 +1355,7 @@ rootLoopPW:
 		move $ra,$t4  
 		j checkedInstructionCorrectTRZ
 	iTiSADDITRZ:
-#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		sb $t0,bufWordTRZ($t7)
 		addi $t7,$t7,1
 		lb $t0,bufforTRZ($t7)
@@ -1642,7 +1642,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopTRZ		
+        		bne $t2, 50, clear_loopTRZ		
 		# Wyczy?? buforNorm
     		la $t0, bufNTRZ     # Za?aduj adres bufora do $t0
     		li $t1, 0            # Za?aduj warto?? zero do $t1
@@ -1655,7 +1655,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopTRZ1
+        		bne $t2, 50, clear_loopTRZ1
 		jr $ra
 	clrWordBufferTRZ:
 			# Wyczy?? bufor s?owa
@@ -1691,7 +1691,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMTRZax2:
-			bgt $t1,24,incDTRZ
+			bgt $t1,50,incDTRZ
 			
 			li $t3,2
 			jr $ra		
@@ -1715,7 +1715,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMTRZax21:
-			bgt $t1,24,incDTRZ
+			bgt $t1,50,incDTRZ
 			
 			li $t3,2
 			jr $ra		
@@ -1741,7 +1741,7 @@ rootLoopPW:
 		j incDCZT
 	iTiSADDCZT:
 	# zapisz na stacku info o instrukcji
-	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		lb $t0,bufforCZT($t7)
 		bne $t0,32,incDCZT
 		li $t0,10	#zaladowanie kodu newline do rej
@@ -1819,7 +1819,7 @@ rootLoopPW:
 		move $ra,$t4  
 		j checkedInstructionCorrectCZT
 	iTiSADDICZT:
-#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		sb $t0,bufWordCZT($t7)
 		addi $t7,$t7,1
 		lb $t0,bufforCZT($t7)
@@ -2106,7 +2106,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopCZT		
+        		bne $t2, 50, clear_loopCZT		
 		# Wyczy?? buforNorm
     		la $t0, bufNCZT     # Za?aduj adres bufora do $t0
     		li $t1, 0            # Za?aduj warto?? zero do $t1
@@ -2119,7 +2119,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopCZT1
+        		bne $t2, 50, clear_loopCZT1
 		jr $ra
 	clrWordBufferCZT:
 			# Wyczy?? bufor s?owa
@@ -2155,7 +2155,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMCZTax2:
-			bgt $t1,24,incDCZT
+			bgt $t1,50,incDCZT
 			
 			li $t3,2
 			jr $ra		
@@ -2179,7 +2179,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMCZTax21:
-			bgt $t1,24,incDCZT
+			bgt $t1,50,incDCZT
 			
 			li $t3,2
 			jr $ra		
@@ -2205,7 +2205,7 @@ rootLoopPW:
 		j incDPT
 	iTiSADDPT:
 	# zapisz na stacku info o instrukcji
-	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+	#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		lb $t0,bufforPT($t7)
 		bne $t0,32,incDPT
 		li $t0,10	#zaladowanie kodu newline do rej
@@ -2283,7 +2283,7 @@ rootLoopPW:
 		move $ra,$t4  
 		j checkedInstructionCorrectPT
 	iTiSADDIPT:
-#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 240 linijek jakby wszystko obsluzyc
+#moznaby tu niby rozwazyc jeszcze spacje przed instrukcj? ale kod mialby 500 linijek jakby wszystko obsluzyc
 		sb $t0,bufWordPT($t7)
 		addi $t7,$t7,1
 		lb $t0,bufforPT($t7)
@@ -2570,7 +2570,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopPT		
+        		bne $t2, 50, clear_loopPT		
 		# Wyczy?? buforNorm
     		la $t0, bufNPT     # Za?aduj adres bufora do $t0
     		li $t1, 0            # Za?aduj warto?? zero do $t1
@@ -2583,7 +2583,7 @@ rootLoopPW:
         		addi $t2, $t2, 1 # Inkrementuj indeks p?tli
         
         		# Sprawd? warunek zako?czenia p?tli
-        		bne $t2, 24, clear_loopPT1
+        		bne $t2, 50, clear_loopPT1
 		jr $ra
 	clrWordBufferPT:
 			# Wyczy?? bufor s?owa
@@ -2619,7 +2619,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMPTax2:
-			bgt $t1,24,incDPT
+			bgt $t1,50,incDPT
 			
 			li $t3,2
 			jr $ra		
@@ -2643,7 +2643,7 @@ rootLoopPW:
 			li $t3,2	#flaga ze 2
 			jr $ra
 			checkForMPTax21:
-			bgt $t1,24,incDPT
+			bgt $t1,50,incDPT
 			
 			li $t3,2
 			jr $ra		
